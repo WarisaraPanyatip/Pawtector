@@ -3,7 +3,8 @@ import SwiftUI
 struct MainTabView: View {
     var body: some View {
         TabView {
-            HomePageView() // Adoption Marketplace
+            HomePageView(pets: Pet.sampleData)
+                .environmentObject(SessionManager()) // Adoption Marketplace
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("Adopt")

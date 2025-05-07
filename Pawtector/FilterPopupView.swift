@@ -1,170 +1,181 @@
 import SwiftUI
 
+enum AgeUnit: String, CaseIterable, Identifiable {
+    case year, month
+    var id: String { rawValue }
+}
+
 struct FilterPopupView: View {
     @Environment(\.dismiss) var dismiss
 
-    // State variables
-    @State private var selectedType = "All"
-    @State private var selectedGender = "Male"
-    @State private var isSterilized = false
-    @State private var age = 2
-    @State private var ageUnit = "Year"
-    @State private var selectedColoration = ""
-    @State private var selectedCity = ""
+    // **Temp** bindings from HomePageView
+    @Binding var filterTypes: Set<String>
+    @Binding var filterGenders: Set<String>
+    @Binding var vaccinatedOnly: Bool
+    @Binding var sterilizedOnly: Bool
+    @Binding var ageValue: Int
+    @Binding var ageUnit: AgeUnit
+    @Binding var selectedColor: String
+    @Binding var selectedCity: String
 
-    let types = ["All", "Cats", "Dogs"]
-    let genders = ["Male", "Female"]
-    let units = ["Year", "Month"]
-    let colorOptions = ["White", "Black", "Brown", "Golden"]
-    let cityOptions = ["Bangkok", "Chiang Mai", "Phuket", "Khon Kaen"]
+    /// Called when “Apply” is tapped
+    let onApply: () -> Void
+
+    // Your real lists…
+    private let colorationOptions = ["Any", "Black", "White", "Brown", "Golden", "Gray", "Tan", "Mixed/Other"]
+    private let cityOptions       = ["Any", "Bangkok", "Chiang Mai", "Phuket", "Pattaya", "Khon Kaen", "Hat Yai"]
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Header
-                    HStack {
-                        Text("Filter")
-                            .font(.system(size: 28, weight: .bold))
-                        Spacer()
-                        Button {
-                            dismiss()
-                        } label: {
-                            Image(systemName: "xmark.circle.fill")
-                                .font(.title)
-                                .foregroundColor(.black)
-                        }
+        // Use a ScrollView for the content
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                // Header + Close
+                HStack {
+                    Text("Filter")
+                        .font(.title2).bold()
+                    Spacer()
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(.secondary)
                     }
-                    .padding(.bottom, 10)
-
-                    // Type
-                    Group {
-                        Text("Type").bold()
-                        HStack {
-                            ForEach(types, id: \.self) { type in
-                                Button(action: {
-                                    selectedType = type
-                                }) {
-                                    Text(type)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 8)
-                                        .background(selectedType == type ? Color(red: 0.7, green: 0.9, blue: 1.0) : Color.white)
-                                        .foregroundColor(.black)
-                                        .cornerRadius(8)
-                                        .shadow(color: .gray.opacity(0.3), radius: 2, x: 0, y: 2)
-                                }
-                            }
-                        }
-                    }
-
-                    // Gender
-                    Group {
-                        Text("Gender").bold()
-                        HStack {
-                            ForEach(genders, id: \.self) { gender in
-                                Button(action: {
-                                    selectedGender = gender
-                                }) {
-                                    Text(gender)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 8)
-                                        .background(selectedGender == gender ? Color(red: 0.7, green: 0.9, blue: 1.0) : Color.white)
-                                        .foregroundColor(.black)
-                                        .cornerRadius(8)
-                                        .shadow(color: .gray.opacity(0.3), radius: 2, x: 0, y: 2)
-                                }
-                            }
-                        }
-                    }
-
-                    // Sterilization
-                    Group {
-                        Text("Vaccination").bold()
-                        Text("Sterilization").bold()
-                        Toggle("", isOn: $isSterilized)
-                            .toggleStyle(SwitchToggleStyle(tint: Color(red: 0.57, green: 0.76, blue: 0.85)))
-                    }
-
-                    // Age
-                    Group {
-                        Text("Age").bold()
-                        HStack {
-                            Button { if age > 0 { age -= 1 } } label: {
-                                Image(systemName: "minus.circle.fill")
-                                    .font(.title2)
-                                    .foregroundColor(.gray)
-                            }
-                            Text("\(age)")
-                                .frame(width: 40)
-                            Button { age += 1 } label: {
-                                Image(systemName: "plus.circle.fill")
-                                    .font(.title2)
-                                    .foregroundColor(.gray)
-                            }
-
-                            Spacer()
-
-                            ForEach(units, id: \.self) { unit in
-                                Button(action: {
-                                    ageUnit = unit
-                                }) {
-                                    Text(unit)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 6)
-                                        .background(ageUnit == unit ? Color(red: 0.7, green: 0.9, blue: 1.0) : Color.white)
-                                        .foregroundColor(.black)
-                                        .cornerRadius(8)
-                                        .shadow(color: .gray.opacity(0.2), radius: 2, x: 0, y: 2)
-                                }
-                            }
-                        }
-                    }
-
-                    // Coloration
-                    Group {
-                        Text("Coloration").bold()
-                        Picker("Select an option", selection: $selectedColoration) {
-                            ForEach(colorOptions, id: \.self) { option in
-                                Text(option).tag(option)
-                            }
-                        }
-                        .pickerStyle(MenuPickerStyle())
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 8).fill(Color.white).shadow(radius: 1))
-                    }
-
-                    // City
-                    Group {
-                        Text("City").bold()
-                        Picker("Select an option", selection: $selectedCity) {
-                            ForEach(cityOptions, id: \.self) { option in
-                                Text(option).tag(option)
-                            }
-                        }
-                        .pickerStyle(MenuPickerStyle())
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 8).fill(Color.white).shadow(radius: 1))
-                    }
-
-                    // Filter button
-                    Button(action: {
-                        // Apply filters
-                        dismiss()
-                    }) {
-                        Text("Filter")
-                            .font(.system(size: 18, weight: .bold))
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color(red: 1.0, green: 0.78, blue: 0.2))
-                            .foregroundColor(.black)
-                            .cornerRadius(12)
-                    }
-                    .padding(.top, 20)
-
                 }
-                .padding()
+
+                // Type pills
+                Text("Type").font(.headline)
+                HStack {
+                    pill("All",  isSelected: filterTypes.isEmpty)        { filterTypes.removeAll() }
+                    pill("Cats", isSelected: filterTypes.contains("Cat")) { toggle(&filterTypes, "Cat") }
+                    pill("Dogs", isSelected: filterTypes.contains("Dog")) { toggle(&filterTypes, "Dog") }
+                }
+
+                // Gender pills
+                Text("Gender").font(.headline)
+                HStack {
+                    pill("Male",   isSelected: filterGenders.contains("Male"))   { toggle(&filterGenders, "Male") }
+                    pill("Female", isSelected: filterGenders.contains("Female")) { toggle(&filterGenders, "Female") }
+                }
+
+                // Switches
+                Toggle("Vaccinated Only", isOn: $vaccinatedOnly)
+                Toggle("Sterilized Only", isOn: $sterilizedOnly)
+
+                // Age selector
+                Text("Age").font(.headline)
+                HStack(spacing: 16) {
+                    Button { if ageValue > 0 { ageValue -= 1 } } label: {
+                        Image(systemName: "minus.circle")
+                    }
+                    Text("\(ageValue)").bold().frame(minWidth: 30)
+                    Button { ageValue += 1 } label: {
+                        Image(systemName: "plus.circle")
+                    }
+                    Spacer()
+                    ForEach(AgeUnit.allCases) { unit in
+                        Button(unit.rawValue.capitalized) {
+                            ageUnit = unit
+                        }
+                        .padding(.vertical, 6).padding(.horizontal, 12)
+                        .background(ageUnit == unit ? Color.brandBlue : Color.gray.opacity(0.2))
+                        .foregroundColor(ageUnit == unit ? .white : .primary)
+                        .cornerRadius(8)
+                    }
+                }
+
+                // Pickers
+                Text("Coloration").font(.headline)
+                Picker("Coloration", selection: $selectedColor) {
+                    ForEach(colorationOptions, id: \.self) { Text($0) }
+                }
+                .pickerStyle(MenuPickerStyle())
+
+                Text("City").font(.headline)
+                Picker("City", selection: $selectedCity) {
+                    ForEach(cityOptions, id: \.self) { Text($0) }
+                }
+                .pickerStyle(MenuPickerStyle())
+
+                // Just add some bottom padding—actual button is in safeAreaInset
+                Spacer().frame(height: 80)
             }
-            .background(Color(red: 0.95, green: 0.95, blue: 0.95))
+            .padding()
         }
+        .background(Color(.systemBackground))
+        .cornerRadius(20, corners: [.topLeft, .topRight])
+        // MARK: pin Apply button above the safe area
+        .safeAreaInset(edge: .bottom) {
+            VStack(spacing: 0) {
+                Divider().background(Color.gray.opacity(0.3))
+                Button(action: {
+                    onApply()
+                }) {
+                    Text("Apply")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.brandYellow)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 16)
+                .background(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: -2)
+            }
+        }
+    }
+
+    // MARK: – Helpers
+
+    private func pill(_ title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline).bold()
+                .padding(.vertical, 6).padding(.horizontal, 12)
+                .background(isSelected ? Color.brandBlue : Color.gray.opacity(0.2))
+                .foregroundColor(isSelected ? .white : .primary)
+                .cornerRadius(8)
+        }
+    }
+
+    private func toggle(_ set: inout Set<String>, _ val: String) {
+        if set.contains(val) { set.remove(val) } else { set.insert(val) }
+    }
+}
+
+struct FilterPopup_Previews: PreviewProvider {
+    static var previews: some View {
+        FilterPopupView(
+            filterTypes: .constant([]),
+            filterGenders: .constant([]),
+            vaccinatedOnly: .constant(false),
+            sterilizedOnly: .constant(false),
+            ageValue: .constant(1),
+            ageUnit: .constant(.year),
+            selectedColor: .constant("Any"),
+            selectedCity: .constant("Any")
+        ) { }
+        .previewLayout(.sizeThatFits)
+    }
+}
+import UIKit
+/// A Shape that rounds only the specified corners
+struct RoundedCorner: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+    func path(in rect: CGRect) -> Path {
+        let uiPath = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(uiPath.cgPath)
+    }
+}
+public extension View {
+    /// Rounds only the given corners of this view
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        clipShape(RoundedCorner(radius: radius, corners: corners))
     }
 }
