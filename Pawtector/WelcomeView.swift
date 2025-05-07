@@ -1,7 +1,7 @@
 import SwiftUI
 import FirebaseAuth
 
-struct ContentView: View {
+struct WelcomeView: View {
     @StateObject private var sessionManager = SessionManager()
     @State private var rootViewId = UUID() // Used to reset the NavigationStack
 
@@ -102,5 +102,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    WelcomeView()
 }
