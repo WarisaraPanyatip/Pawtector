@@ -37,7 +37,7 @@ struct WelcomeView: View {
                         Spacer()
 
                         // Icon
-                        Image("pawtector_white_icon")
+                        Image("logo_white")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 250, height: 150)
