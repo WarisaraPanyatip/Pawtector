@@ -24,16 +24,6 @@ struct WelcomeView: View {
                     .ignoresSafeArea()
 
                     VStack(spacing: 30) {
-                        // Header label
-                        HStack {
-                            Text("Sign up")
-                                .foregroundColor(Color(red: 0.64, green: 0.81, blue: 1.0))
-                                .font(.system(size: 18, weight: .medium))
-                                .padding(.top, 50)
-                                .padding(.leading, 20)
-                            Spacer()
-                        }
-
                         Spacer()
 
                         // Icon
