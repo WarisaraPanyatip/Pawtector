@@ -2,75 +2,71 @@ import SwiftUI
 
 struct EditProfileView: View {
     @State private var username = ""
-    @State private var gender = "Male"
-    @State private var email = ""
-    @State private var phone = ""
     @State private var showToast = false
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                VStack(spacing: 20) {
-                    Text("Edit profile")
-                        .font(.headline)
+        ZStack {
+            VStack(spacing: 30) {
+                Text("Edit Profile")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.brandBlue)
 
-                    Image(systemName: "person.circle")
-                        .resizable()
-                        .frame(width: 100, height: 100)
-                        .foregroundColor(.purple)
+                Image(systemName: "person.crop.circle.fill")
+                    .resizable()
+                    .frame(width: 120, height: 120)
+                    .foregroundColor(.brandBlue.opacity(0.3))
 
-                    TextField("Username", text: $username)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Username")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
 
-                    Picker("Gender", selection: $gender) {
-                        Text("Male").tag("Male")
-                        Text("Female").tag("Female")
+                    TextField("Enter your username", text: $username)
+                        .padding()
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(10)
+                }
+
+                Button(action: {
+                    print("Saved changes for \(username)")
+                    withAnimation {
+                        showToast = true
                     }
-                    .pickerStyle(MenuPickerStyle())
-
-                    TextField("Email", text: $email)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                    TextField("Phone Number", text: $phone)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                    Button("Save") {
-                        print("Saved changes for \(username)")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         withAnimation {
-                            showToast = true
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            withAnimation {
-                                showToast = false
-                            }
+                            showToast = false
                         }
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue.opacity(0.3))
-                    .cornerRadius(8)
+                }) {
+                    Text("Save Changes")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.brandYellow)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
 
+                Spacer()
+            }
+            .padding()
+
+            // Toast Notification
+            if showToast {
+                VStack {
                     Spacer()
+                    Text("✅ Profile saved successfully")
+                        .font(.subheadline)
+                        .padding()
+                        .background(Color.black.opacity(0.8))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .padding(.bottom, 50)
                 }
-                .padding()
-
-                // Toast Notification
-                if showToast {
-                    VStack {
-                        Spacer()
-                        Text("✅ Profile saved successfully")
-                            .font(.subheadline)
-                            .padding()
-                            .background(Color.black.opacity(0.8))
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                            .padding(.bottom, 50)
-                    }
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .navigationTitle("Edit Profile")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
-
-

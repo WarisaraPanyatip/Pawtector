@@ -16,7 +16,7 @@
 import SwiftUI
 
 extension Color {
-    /// Hex initializer (supports "#RRGGBB" or "RRGGBBAA")
+    //Hex initializer (supports "#RRGGBB" or "RRGGBBAA")
     init(hex: String) {
         var hexString = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         if hexString.hasPrefix("#") { hexString.removeFirst() }

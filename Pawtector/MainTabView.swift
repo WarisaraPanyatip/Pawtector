@@ -16,7 +16,7 @@ struct MainTabView: View {
                     Text("Report Stray")
                 }
 
-            LostAndFoundView() // Lost/found pet listing
+            //LostAndFoundView() // Lost/found pet listing
                 .tabItem {
                     Image(systemName: "magnifyingglass.circle.fill")
                     Text("Lost & Found")
