@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @State private var selectedTab: Int = 0
+    @State private var favorites: Set<UUID> = []
 
     var body: some View {
         ZStack {
@@ -9,12 +10,20 @@ struct MainTabView: View {
                 switch selectedTab {
                 case 0:
                     NavigationStack {
-                        HomePageView(pets: Pet.sampleData)
-                            .environmentObject(SessionManager())
+                        HomePageView(
+                            pets: Pet.sampleData,
+                            favorites: $favorites,
+                            selectedTab: $selectedTab
+                        )
+                        .environmentObject(SessionManager())
                     }
                 case 1:
                     NavigationStack {
-                        Text("Favorite") // Placeholder for favorite view
+                        FavoriteView(
+                            pets: Pet.sampleData,
+                            favorites: $favorites,
+                            selectedTab: $selectedTab
+                        )
                     }
                 case 2:
                     NavigationStack {
@@ -30,8 +39,12 @@ struct MainTabView: View {
                     }
                 default:
                     NavigationStack {
-                        HomePageView(pets: Pet.sampleData)
-                            .environmentObject(SessionManager())
+                        HomePageView(
+                            pets: Pet.sampleData,
+                            favorites: $favorites,
+                            selectedTab: $selectedTab
+                        )
+                        .environmentObject(SessionManager())
                     }
                 }
             }
