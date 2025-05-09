@@ -44,6 +44,10 @@ struct ProfileView: View {
                 NavigationLink(destination: InstructionsView()) {
                     ProfileActionButton(label: "How to Use", icon: "info.circle", bgColor: Color.brandBlue.opacity(0.5))
                 }
+                
+                NavigationLink(destination: HistoryView()) {
+                    ProfileActionButton(label: "History", icon: "clock.circle", bgColor: Color.brandBlue.opacity(0.5))
+                }
 
                 Button(action: {
                     session.signOut()

@@ -27,7 +27,7 @@ struct MainTabView: View {
                     }
                 case 2:
                     NavigationStack {
-                        ReportStrayView()
+                        ReportStraytView()
                     }
                 case 3:
                     NavigationStack {
