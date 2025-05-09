@@ -131,8 +131,8 @@ struct HomePageView: View {
                         .padding(.bottom, 8)
                     }
 
-                    bottomNav // Bottom tab bar
-                        .padding(.bottom, 8)
+//                    bottomNav // Bottom tab bar
+//                        .padding(.bottom, 8)
                 }
                 
                 // MARK: – Filter sheet
@@ -212,20 +212,20 @@ struct HomePageView: View {
         .padding()
     }
 
-    // MARK: – Bottom Tab Bar View
-    private var bottomNav: some View {
-        HStack(spacing: 32) {
-            navButton(icon: "house.fill",      isSelected: true)
-            navButton(icon: "heart",           isSelected: false)
-            navButton(icon: "bell",            isSelected: false)
-            navButton(icon: "magnifyingglass", isSelected: false)
-            navButton(icon: "person",          isSelected: false)
-        }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 16)
-        .background(Color.brandBlue)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-    }
+//    // MARK: – Bottom Tab Bar View
+//    private var bottomNav: some View {
+//        HStack(spacing: 32) {
+//            navButton(icon: "house.fill",      isSelected: true)
+//            navButton(icon: "heart",           isSelected: false)
+//            navButton(icon: "bell",            isSelected: false)
+//            navButton(icon: "magnifyingglass", isSelected: false)
+//            navButton(icon: "person",          isSelected: false)
+//        }
+//        .padding(.vertical, 8)
+//        .padding(.horizontal, 16)
+//        .background(Color.brandBlue)
+//        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+//    }
 
     // MARK: – Navigation Button Component
     private func navButton(icon: String, isSelected: Bool) -> some View {

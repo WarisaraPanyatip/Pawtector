@@ -18,7 +18,12 @@ struct Pet: Identifiable {
     let personality: String
     let healthStatus: String
     let trainingStatus: String
+    let breed: String
+    let location: String
+    let reward: String
+    let isFound: Bool
 }
+
 
 extension Pet {
     static let sampleData: [Pet] = [
@@ -32,7 +37,11 @@ extension Pet {
             background: "Found on the street after being abandoned.",
             personality: "Friendly with people and other dogs.",
             healthStatus: "Up-to-date on vaccinations, no medical issues.",
-            trainingStatus: "Basic commands: sit, stay."
+            trainingStatus: "Basic commands: sit, stay.",
+            breed: "Shiba Inu",
+            location: "Bangkok",
+            reward: "$100",
+            isFound: false
         ),
         Pet(
             id: UUID(),
@@ -44,7 +53,11 @@ extension Pet {
             background: "Rescued from a high-kill shelter.",
             personality: "Calm, enjoys cuddles.",
             healthStatus: "Spayed, vaccinated.",
-            trainingStatus: "Litter-trained."
+            trainingStatus: "Litter-trained.",
+            breed: "Persian",
+            location: "Chiang Mai",
+            reward: "$80",
+            isFound: false
         ),
         Pet(
             id: UUID(),
@@ -56,7 +69,11 @@ extension Pet {
             background: "Owner couldn’t keep him due to moving.",
             personality: "Energetic, loves fetch.",
             healthStatus: "Minor allergies under treatment.",
-            trainingStatus: "Advanced commands: roll over."
+            trainingStatus: "Advanced commands: roll over.",
+            breed: "Golden Retriever",
+            location: "Phuket",
+            reward: "$150",
+            isFound: true
         ),
         Pet(
             id: UUID(),
@@ -68,7 +85,11 @@ extension Pet {
             background: "Born in a barn, very curious.",
             personality: "Playful and mischievous.",
             healthStatus: "Vaccinations scheduled.",
-            trainingStatus: "Working on scratching post use."
+            trainingStatus: "Working on scratching post use.",
+            breed: "Siamese",
+            location: "Ayutthaya",
+            reward: "$50",
+            isFound: false
         ),
         Pet(
             id: UUID(),
@@ -80,7 +101,11 @@ extension Pet {
             background: "Surrendered by previous owner.",
             personality: "Gentle, great with kids.",
             healthStatus: "Healthy, spayed.",
-            trainingStatus: "House-trained."
+            trainingStatus: "House-trained.",
+            breed: "Beagle",
+            location: "Khon Kaen",
+            reward: "$120",
+            isFound: false
         ),
         Pet(
             id: UUID(),
@@ -92,7 +117,11 @@ extension Pet {
             background: "Found wandering near park.",
             personality: "Loyal, a bit shy at first.",
             healthStatus: "Hip dysplasia – needs gentle play.",
-            trainingStatus: "Basic commands."
+            trainingStatus: "Basic commands.",
+            breed: "Labrador",
+            location: "Udon Thani",
+            reward: "$70",
+            isFound: false
         ),
         Pet(
             id: UUID(),
@@ -104,7 +133,11 @@ extension Pet {
             background: "Owner allergic, rehomed.",
             personality: "Affectionate lap cat.",
             healthStatus: "Spayed, healthy.",
-            trainingStatus: "Litter-trained."
+            trainingStatus: "Litter-trained.",
+            breed: "Bengal",
+            location: "Nakhon Pathom",
+            reward: "$90",
+            isFound: true
         ),
         Pet(
             id: UUID(),
@@ -116,7 +149,11 @@ extension Pet {
             background: "Rescued from flood zone.",
             personality: "Brave, loves water.",
             healthStatus: "Vaccinated, microchipped.",
-            trainingStatus: "Working on leash manners."
+            trainingStatus: "Working on leash manners.",
+            breed: "Border Collie",
+            location: "Hat Yai",
+            reward: "$110",
+            isFound: false
         )
     ]
 }
