@@ -24,6 +24,18 @@ struct FilterPopupView: View {
     // Your real lists…
     private let colorationOptions = ["Any", "Black", "White", "Brown", "Golden", "Gray", "Tan", "Mixed/Other"]
     private let cityOptions       = ["Any", "Bangkok", "Chiang Mai", "Phuket", "Pattaya", "Khon Kaen", "Hat Yai"]
+    
+    //clear filter
+    private func clearAllFilters() {
+        filterTypes.removeAll()
+        filterGenders.removeAll()
+        vaccinatedOnly = false
+        sterilizedOnly = false
+        ageValue = 0
+        ageUnit = .year
+        selectedColor = "Any"
+        selectedCity = "Any"
+    }
 
     var body: some View {
         // Use a ScrollView for the content
@@ -34,6 +46,15 @@ struct FilterPopupView: View {
                     Text("Filter")
                         .font(.title2).bold()
                     Spacer()
+                    // Clear All Button
+                     Button {
+                         clearAllFilters()
+                     } label: {
+                         Text("Clear All")
+                             .font(.subheadline).bold()
+                             .foregroundColor(.brandBrown)
+                     }
+                     //cancle
                     Button { dismiss() } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.title2)
@@ -66,7 +87,10 @@ struct FilterPopupView: View {
                     Button { if ageValue > 0 { ageValue -= 1 } } label: {
                         Image(systemName: "minus.circle")
                     }
-                    Text("\(ageValue)").bold().frame(minWidth: 30)
+                    Text(ageValue == 0 ? "All" : "\(ageValue)")
+                        .bold()
+                        .frame(minWidth: 30)
+
                     Button { ageValue += 1 } label: {
                         Image(systemName: "plus.circle")
                     }
@@ -102,6 +126,9 @@ struct FilterPopupView: View {
         }
         .background(Color(.systemBackground))
         .cornerRadius(20, corners: [.topLeft, .topRight])
+        
+      
+
         // MARK: pin Apply button above the safe area
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 0) {

@@ -5,11 +5,13 @@ struct ProfileView: View {
 
     var body: some View {
         VStack(spacing: 24) {
+            // Title
             Text("Profile")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(.brandBrown)
 
+            // Profile Image
             Circle()
                 .fill(Color.brandYellow.opacity(0.2))
                 .frame(width: 140, height: 140)
@@ -27,8 +29,8 @@ struct ProfileView: View {
                 .fontWeight(.semibold)
                 .foregroundColor(.brandBrown)
 
-            // Phone number
-            if let phone = session.currentUser?.phone {
+            // Phone number (if available)
+            if let phone = session.currentUser?.phone, !phone.isEmpty {
                 Text(phone)
                     .font(.subheadline)
                     .foregroundColor(.gray)
@@ -36,6 +38,7 @@ struct ProfileView: View {
 
             Spacer()
 
+            // Action Buttons
             VStack(spacing: 12) {
                 NavigationLink(destination: EditProfileView()) {
                     ProfileActionButton(label: "Edit Profile", icon: "pencil", bgColor: Color.brandBlue.opacity(0.7))
@@ -44,7 +47,7 @@ struct ProfileView: View {
                 NavigationLink(destination: InstructionsView()) {
                     ProfileActionButton(label: "How to Use", icon: "info.circle", bgColor: Color.brandBlue.opacity(0.5))
                 }
-                
+
                 NavigationLink(destination: HistoryView()) {
                     ProfileActionButton(label: "History", icon: "clock.circle", bgColor: Color.brandBlue.opacity(0.5))
                 }
@@ -59,8 +62,10 @@ struct ProfileView: View {
             Spacer()
         }
         .padding()
-        .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.inline)
+//        .onAppear {
+//            session.wrappedValue.loadUser()  // ✅ Access the underlying object
+//        }
     }
 }
 

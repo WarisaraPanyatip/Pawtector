@@ -1,43 +1,33 @@
-//
-//  PetDetailView.swift
-//  Pawtector
-//
-//  Created by venuswaran on 7/5/2568 BE.
-//
-
 import SwiftUI
 
 struct PetDetailView: View {
     let pet: Pet
-    
-    // Dismiss the current view from the navigation stack (back to HomePageView)
+
     @Environment(\.dismiss) private var navDismiss
-    
-    @State private var showAdopt   = false // Controls the adoption request sheet
-    @State private var requestSent = false // Tracks if the request was submitted
+    @State private var showAdopt = false
+    @State private var requestSent = false
 
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                
+
                 // MARK: – Pet Image
                 Image(pet.imageName)
                     .resizable()
                     .scaledToFill()
                     .frame(height: 300)
                     .clipped()
-                
+
                 // MARK: – Pet Name
                 Text(pet.name)
                     .font(.system(size: 32, weight: .bold))
                     .foregroundColor(.brandBrown)
-                
+
                 // MARK: – Info Chips: Type, Age, Gender
                 HStack(spacing: 16) {
                     infoChip(icon: "pawprint.fill", text: pet.type)
-                    infoChip(icon: "calendar", text: pet.ageDescription)
-                    infoChip(icon: pet.gender == "Male" ? "m.circle" : "f.circle",
-                             text: pet.gender)
+                    infoChip(icon: "calendar", text: formattedAge(pet.ageDescription))
+                    infoChip(icon: pet.gender == "Male" ? "m.circle" : "f.circle", text: pet.gender)
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
@@ -45,8 +35,8 @@ struct PetDetailView: View {
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color(.systemGray6))
                 )
-                
-                // MARK: – Detail Blocks: Background, Personality, Health, Training
+
+                // MARK: – Detail Blocks
                 VStack(spacing: 16) {
                     detailBlock(
                         icon: "map.fill",
@@ -69,8 +59,8 @@ struct PetDetailView: View {
                         text: pet.trainingStatus
                     )
                 }
-                
-                // MARK: – Contact Foundation / Request Button
+
+                // MARK: – Contact Foundation Button
                 Button {
                     showAdopt = true
                 } label: {
@@ -82,19 +72,15 @@ struct PetDetailView: View {
                         .foregroundColor(.white)
                         .cornerRadius(12)
                 }
-                .disabled(requestSent) // Prevent double-submission
+                .disabled(requestSent)
             }
             .padding()
         }
         .navigationTitle("Pet Details")
         .navigationBarTitleDisplayMode(.inline)
-        
-        // MARK: – Adoption Sheet
         .sheet(isPresented: $showAdopt) {
             RequestAdoptionView(requestSent: $requestSent)
         }
-
-        // MARK: – Auto-dismiss when request is sent
         .onChange(of: requestSent) { sent in
             if sent {
                 navDismiss()
@@ -102,7 +88,7 @@ struct PetDetailView: View {
         }
     }
 
-    // MARK: – Reusable Info Chip View
+    // MARK: – Reusable Info Chip
     private func infoChip(icon: String, text: String) -> some View {
         HStack {
             Image(systemName: icon)
@@ -116,8 +102,8 @@ struct PetDetailView: View {
                 .stroke(Color.brandBrown, lineWidth: 1)
         )
     }
-    
-    // MARK: – Reusable Detail Block View
+
+    // MARK: – Reusable Detail Block
     private func detailBlock(icon: String, title: String, text: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
@@ -136,6 +122,16 @@ struct PetDetailView: View {
                 .fill(Color(.systemGray6))
         )
     }
+
+    // MARK: – Helper: Format Age
+    private func formattedAge(_ age: Float) -> String {
+        if age < 1 {
+            let months = Int(round(age * 12))
+            return "\(months) month\(months == 1 ? "" : "s")"
+        } else {
+            return String(format: "%.1f year%@", age, age == 1.0 ? "" : "s")
+        }
+    }
 }
 
 // MARK: – Preview
@@ -146,4 +142,3 @@ struct PetDetailView_Previews: PreviewProvider {
         }
     }
 }
-
