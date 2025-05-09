@@ -1,4 +1,10 @@
 import SwiftUI
+
+
+
+
+/// PET TILE VIEW ////////
+
 struct PetTileView: View {
     let pet: Pet
     let isFavorite: Bool
@@ -17,7 +23,7 @@ struct PetTileView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(pet.name)
                             .font(.headline)
-                        Text(pet.ageDescription)
+                        Text(formattedAge(pet.ageDescription))
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -51,7 +57,20 @@ struct PetTileView: View {
             .offset(x: -12, y: 12)
         }
     }
+
+    private func formattedAge(_ age: Float) -> String {
+        if age < 1 {
+            let months = Int(round(age * 12))
+            return "\(months) month\(months == 1 ? "" : "s")"
+        } else {
+            return String(format: "%.1f year%@", age, age == 1.0 ? "" : "s")
+        }
+    }
 }
+
+
+
+///////HOMEPAGE VIEW///////
 
 
 struct HomePageView: View {
@@ -84,9 +103,25 @@ struct HomePageView: View {
     private var filteredPets: [Pet] {
         pets.filter { pet in
             (filterTypes.isEmpty || filterTypes.contains(pet.type)) &&
-            (filterGenders.isEmpty || filterGenders.contains(pet.gender))
+            (filterGenders.isEmpty || filterGenders.contains(pet.gender)) &&
+            (!vaccinatedOnly || pet.healthStatus.localizedCaseInsensitiveContains("vaccinated")) &&
+            (!sterilizedOnly || pet.healthStatus.localizedCaseInsensitiveContains("spayed") || pet.healthStatus.localizedCaseInsensitiveContains("neutered")) &&
+            (selectedCity == "Any" || pet.location == selectedCity) &&
+            ageMatches(pet)
         }
     }
+
+
+    private func ageMatches(_ pet: Pet) -> Bool {
+        switch ageUnit {
+        case .year:
+            return pet.ageDescription <= Float(ageValue)
+        case .month:
+            let ageInMonths = pet.ageDescription * 12
+            return ageInMonths <= Float(ageValue)
+        }
+    }
+
     
     var body: some View {
         NavigationStack {
@@ -141,7 +176,7 @@ struct HomePageView: View {
             .navigationBarHidden(true)
         }
     }
-    
+    ////////header ///////
     private var header: some View {
         HStack {
             ZStack {
@@ -194,8 +229,9 @@ struct HomePageView: View {
         }
     }
 }
+
             
             
             
-            //----------------------------- Preview -----------------------------
+
             

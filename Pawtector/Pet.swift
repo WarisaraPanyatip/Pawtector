@@ -13,7 +13,7 @@ struct Pet: Identifiable {
     let imageName: String
     let type: String
     let gender: String
-    let ageDescription: String
+    let ageDescription:Float32
     let background: String
     let personality: String
     let healthStatus: String
@@ -33,7 +33,7 @@ extension Pet {
             imageName: "dog1",
             type: "Dog",
             gender: "Male",
-            ageDescription: "1 year",
+            ageDescription: 1,
             background: "Found on the street after being abandoned.",
             personality: "Friendly with people and other dogs.",
             healthStatus: "Up-to-date on vaccinations, no medical issues.",
@@ -49,7 +49,7 @@ extension Pet {
             imageName: "cat1",
             type: "Cat",
             gender: "Female",
-            ageDescription: "2 years",
+            ageDescription: 2,
             background: "Rescued from a high-kill shelter.",
             personality: "Calm, enjoys cuddles.",
             healthStatus: "Spayed, vaccinated.",
@@ -65,7 +65,7 @@ extension Pet {
             imageName: "dog1",
             type: "Dog",
             gender: "Male",
-            ageDescription: "3 years",
+            ageDescription: 3,
             background: "Owner couldn’t keep him due to moving.",
             personality: "Energetic, loves fetch.",
             healthStatus: "Minor allergies under treatment.",
@@ -81,7 +81,7 @@ extension Pet {
             imageName: "cat1",
             type: "Cat",
             gender: "Female",
-            ageDescription: "6 months",
+            ageDescription: 0.5,
             background: "Born in a barn, very curious.",
             personality: "Playful and mischievous.",
             healthStatus: "Vaccinations scheduled.",
@@ -97,7 +97,7 @@ extension Pet {
             imageName: "dog1",
             type: "Dog",
             gender: "Female",
-            ageDescription: "4 years",
+            ageDescription: 4,
             background: "Surrendered by previous owner.",
             personality: "Gentle, great with kids.",
             healthStatus: "Healthy, spayed.",
@@ -113,7 +113,7 @@ extension Pet {
             imageName: "dog1",
             type: "Dog",
             gender: "Male",
-            ageDescription: "5 years",
+            ageDescription: 5,
             background: "Found wandering near park.",
             personality: "Loyal, a bit shy at first.",
             healthStatus: "Hip dysplasia – needs gentle play.",
@@ -129,7 +129,7 @@ extension Pet {
             imageName: "cat1",
             type: "Cat",
             gender: "Female",
-            ageDescription: "1.5 years",
+            ageDescription: 1.5,
             background: "Owner allergic, rehomed.",
             personality: "Affectionate lap cat.",
             healthStatus: "Spayed, healthy.",
@@ -145,7 +145,7 @@ extension Pet {
             imageName: "dog1",
             type: "Dog",
             gender: "Male",
-            ageDescription: "2 years",
+            ageDescription: 2,
             background: "Rescued from flood zone.",
             personality: "Brave, loves water.",
             healthStatus: "Vaccinated, microchipped.",
