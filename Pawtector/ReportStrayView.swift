@@ -19,7 +19,7 @@ struct ReportStraytView: View {
             VStack(alignment: .leading, spacing: 20) {
                 
                 HStack(alignment: .center) {
-                    Image("logo_white")
+                    Image("logo_black")
                         .resizable()
                         .frame(width: 60, height: 60)
                         .padding(.leading, 16)
@@ -27,14 +27,14 @@ struct ReportStraytView: View {
                     Spacer()
 
                     VStack(alignment: .trailing, spacing: 2) {
-                        Text("Lost & Found")
+                        Text("Report a Stray")
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(.black)
 
-                        Text("help them find the way home")
+                        Text("rescue them by SoiDog")
                             .font(.footnote)
-                            .foregroundColor(Color(hex: "#FDBC33"))
+                            .foregroundColor(Color.brown)
                     }
                     .padding(.trailing, 16)
                 }
