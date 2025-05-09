@@ -418,24 +418,24 @@ struct ReportLostView: View {
                 }
             }
 
-            // History button (floating)
-            Button(action: {
-                isHistoryPresented = true
-            }) {
-                Text("View History")
-                    .font(.footnote)
-                    .fontWeight(.semibold)
-                    .padding(10)
-                    .background(Color.white)
-                    .foregroundColor(Color(hex: "#77BED1"))
-                    .cornerRadius(10)
-                    .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
-            }
-            .padding(.trailing, 16)
-            .padding(.top, 10)
-            .sheet(isPresented: $isHistoryPresented) {
-                HistoryLostView()
-            }
+//            // History button (floating)
+//            Button(action: {
+//                isHistoryPresented = true
+//            }) {
+//                Text("View History")
+//                    .font(.footnote)
+//                    .fontWeight(.semibold)
+//                    .padding(10)
+//                    .background(Color.white)
+//                    .foregroundColor(Color(hex: "#77BED1"))
+//                    .cornerRadius(10)
+//                    .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
+//            }
+//            .padding(.trailing, 16)
+//            .padding(.top, 10)
+//            .sheet(isPresented: $isHistoryPresented) {
+//                HistoryLostView()
+//            }
         }
     }
 }
