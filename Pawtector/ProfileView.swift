@@ -46,7 +46,7 @@ struct ProfileView: View {
                 }
                 
                 NavigationLink(destination: HistoryView()) {
-                    ProfileActionButton(label: "History", icon: "history.circle", bgColor: Color.brandBlue.opacity(0.5))
+                    ProfileActionButton(label: "History", icon: "clock.circle", bgColor: Color.brandBlue.opacity(0.5))
                 }
 
                 Button(action: {
