@@ -41,21 +41,21 @@ struct ProfileView: View {
             // Action Buttons
             VStack(spacing: 12) {
                 NavigationLink(destination: EditProfileView()) {
-                    ProfileActionButton(label: "Edit Profile", icon: "pencil", bgColor: Color.brandBlue.opacity(0.7))
+                    ProfileActionButton(label: "Edit Profile", icon: "pencil", bgColor: Color.brandBlue)
                 }
 
                 NavigationLink(destination: InstructionsView()) {
-                    ProfileActionButton(label: "How to Use", icon: "info.circle", bgColor: Color.brandBlue.opacity(0.5))
+                    ProfileActionButton(label: "How to Use", icon: "info.circle", bgColor: Color.brandBlue)
                 }
 
                 NavigationLink(destination: HistoryView()) {
-                    ProfileActionButton(label: "History", icon: "clock.circle", bgColor: Color.brandBlue.opacity(0.5))
+                    ProfileActionButton(label: "History", icon: "clock.circle", bgColor: Color.brandBlue)
                 }
 
                 Button(action: {
                     session.signOut()
                 }) {
-                    ProfileActionButton(label: "Log Out", icon: "arrow.right.square", bgColor: Color.brandBlue.opacity(0.4))
+                    ProfileActionButton(label: "Log Out", icon: "arrow.right.square", bgColor: Color.brandBlue)
                 }
             }
 
