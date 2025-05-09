@@ -417,50 +417,10 @@ struct ReportLostView: View {
                     .padding(.bottom, 20)
                 }
             }
-
-//            // History button (floating)
-//            Button(action: {
-//                isHistoryPresented = true
-//            }) {
-//                Text("View History")
-//                    .font(.footnote)
-//                    .fontWeight(.semibold)
-//                    .padding(10)
-//                    .background(Color.white)
-//                    .foregroundColor(Color(hex: "#77BED1"))
-//                    .cornerRadius(10)
-//                    .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
-//            }
-//            .padding(.trailing, 16)
-//            .padding(.top, 10)
-//            .sheet(isPresented: $isHistoryPresented) {
-//                HistoryLostView()
-//            }
         }
     }
 }
 
-// MARK: - HistoryLostView
-struct HistoryLostView: View {
-    var body: some View {
-        List {
-            NavigationLink(
-                destination: LostAndFoundDetailView(
-                    pet: Pet.sampleData.first!
-                )
-            ) {
-                HStack {
-                    Image(systemName: "photo")
-                    VStack(alignment: .leading) {
-                        Text("Type: Dog")
-                        Text("Status: Sick")
-                        Text("Date: 02/04/2025")
-                    }
-                }
-            }
-        }
-    }
-}
 
 #Preview {
     LostAndFoundView()
