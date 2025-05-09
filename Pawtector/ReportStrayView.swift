@@ -17,6 +17,28 @@ struct ReportStraytView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                
+                HStack(alignment: .center) {
+                    Image("logo_white")
+                        .resizable()
+                        .frame(width: 60, height: 60)
+                        .padding(.leading, 16)
+
+                    Spacer()
+
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("Lost & Found")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+
+                        Text("help them find the way home")
+                            .font(.footnote)
+                            .foregroundColor(Color(hex: "#FDBC33"))
+                    }
+                    .padding(.trailing, 16)
+                }
+                .padding(.top, 16)
 
                 VStack(alignment: .leading, spacing: 16) {
                     Group {
