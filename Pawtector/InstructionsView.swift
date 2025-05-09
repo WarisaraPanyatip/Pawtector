@@ -75,9 +75,3 @@ struct InstructionStepView: View {
         .cornerRadius(10)
     }
 }
-
-struct InstructionsView_Previews: PreviewProvider {
-    static var previews: some View {
-        InstructionsView()
-    }
-}
