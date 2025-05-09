@@ -84,7 +84,7 @@ struct HomePageView: View {
     @State private var filterGenders     = Set<String>()
     @State private var vaccinatedOnly    = false
     @State private var sterilizedOnly    = false
-    @State private var ageValue          = 1
+    @State private var ageValue          = 0
     @State private var ageUnit: AgeUnit  = .year
     @State private var selectedColor     = "Any"
     @State private var selectedCity      = "Any"
@@ -92,7 +92,7 @@ struct HomePageView: View {
     @State private var tempFilterGenders = Set<String>()
     @State private var tempVaccinatedOnly = false
     @State private var tempSterilizedOnly = false
-    @State private var tempAgeValue      = 1
+    @State private var tempAgeValue      = 0
     @State private var tempAgeUnit: AgeUnit = .year
     @State private var tempSelectedColor = "Any"
     @State private var tempSelectedCity  = "Any"
