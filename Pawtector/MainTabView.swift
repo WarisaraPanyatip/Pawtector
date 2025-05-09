@@ -1,32 +1,48 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @State private var selectedTab: Int = 0
+
     var body: some View {
-        TabView {
-            HomePageView(pets: Pet.sampleData)
-                .environmentObject(SessionManager()) // Adoption Marketplace
-                .tabItem {
-                    Image(systemName: "house.fill")
-                    Text("Adopt")
+        ZStack {
+            Group {
+                switch selectedTab {
+                case 0:
+                    NavigationStack {
+                        HomePageView(pets: Pet.sampleData)
+                            .environmentObject(SessionManager())
+                    }
+                case 1:
+                    NavigationStack {
+                        Text("Favorite") // Placeholder for favorite view
+                    }
+                case 2:
+                    NavigationStack {
+                        ReportStrayView()
+                    }
+                case 3:
+                    NavigationStack {
+                        LostAndFoundView()
+                    }
+                case 4:
+                    NavigationStack {
+                        ProfileView()
+                    }
+                default:
+                    NavigationStack {
+                        HomePageView(pets: Pet.sampleData)
+                            .environmentObject(SessionManager())
+                    }
                 }
+            }
+            .padding(.bottom, 80)
+            .ignoresSafeArea(.keyboard)
 
-            ReportStrayView() // Stray animal reporting
-                .tabItem {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                    Text("Report Stray")
-                }
-
-            //LostAndFoundView() // Lost/found pet listing
-                .tabItem {
-                    Image(systemName: "magnifyingglass.circle.fill")
-                    Text("Lost & Found")
-                }
-
-            ProfileView() // User profile / settings
-                .tabItem {
-                    Image(systemName: "person.crop.circle")
-                    Text("Profile")
-                }
+            VStack {
+                Spacer()
+                FloatingTabBar(selectedTab: $selectedTab)
+            }
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
 }
