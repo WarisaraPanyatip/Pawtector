@@ -31,7 +31,7 @@ struct FilterPopupView: View {
         filterGenders.removeAll()
         vaccinatedOnly = false
         sterilizedOnly = false
-        ageValue = 1
+        ageValue = 0
         ageUnit = .year
         selectedColor = "Any"
         selectedCity = "Any"
@@ -87,7 +87,10 @@ struct FilterPopupView: View {
                     Button { if ageValue > 0 { ageValue -= 1 } } label: {
                         Image(systemName: "minus.circle")
                     }
-                    Text("\(ageValue)").bold().frame(minWidth: 30)
+                    Text(ageValue == 0 ? "All" : "\(ageValue)")
+                        .bold()
+                        .frame(minWidth: 30)
+
                     Button { ageValue += 1 } label: {
                         Image(systemName: "plus.circle")
                     }

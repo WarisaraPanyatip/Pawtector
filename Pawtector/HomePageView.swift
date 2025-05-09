@@ -111,16 +111,21 @@ struct HomePageView: View {
         }
     }
 
-
     private func ageMatches(_ pet: Pet) -> Bool {
+        if ageValue == 0 {
+            return true // No filter
+        }
+
         switch ageUnit {
         case .year:
-            return pet.ageDescription <= Float(ageValue)
+            return Int(round(pet.ageDescription)) == ageValue
         case .month:
-            let ageInMonths = pet.ageDescription * 12
-            return ageInMonths <= Float(ageValue)
+            let ageInMonths = Int(round(pet.ageDescription * 12))
+            return ageInMonths == ageValue
         }
     }
+
+
 
     
     var body: some View {
