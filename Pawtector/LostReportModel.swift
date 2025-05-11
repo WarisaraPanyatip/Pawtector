@@ -7,20 +7,25 @@ class LostReportModel: ObservableObject {
     private let db = Firestore.firestore()
 
     func fetchLostReports() {
+        let db = Firestore.firestore()
         db.collection("LostReport").getDocuments { snapshot, error in
             if let error = error {
-                print("❌ Error fetching: \(error.localizedDescription)")
+                print("❌ Error fetching lost reports: \(error.localizedDescription)")
                 return
             }
 
-            self.lostPets = snapshot?.documents.compactMap { doc in
+            print("📦 Found \(snapshot?.documents.count ?? 0) documents")
+
+            self.lostPets = snapshot?.documents.compactMap { doc -> LostPet? in
                 let data = doc.data()
+                print("🔍 Document: \(data)")
+
                 guard let pid = data["pid"] as? String,
                       let name = data["name"] as? String,
                       let type = data["type"] as? String,
                       let breed = data["breed"] as? String,
                       let gender = data["gender"] as? String,
-                      let age = data["age"] as? Float,
+                      let ageValue = data["age"] as? Double, // ← allow Double from Firestore
                       let imageName = data["imageName"] as? String,
                       let healthStatus = data["healthStatus"] as? String,
                       let personality = data["personality"] as? String,
@@ -31,7 +36,9 @@ class LostReportModel: ObservableObject {
                       let contact = data["contact"] as? String,
                       let color = data["color"] as? String,
                       let size = data["size"] as? String,
-                      let wearing = data["wearing"] as? String else {
+                      let wearing = data["wearing"] as? String
+                else {
+                    print("⚠️ Skipped document: missing or invalid field")
                     return nil
                 }
 
@@ -41,7 +48,7 @@ class LostReportModel: ObservableObject {
                     type: type,
                     breed: breed,
                     gender: gender,
-                    age: age,
+                    age: Float(ageValue),
                     imageName: imageName,
                     healthStatus: healthStatus,
                     personality: personality,
@@ -55,6 +62,10 @@ class LostReportModel: ObservableObject {
                     wearing: wearing
                 )
             } ?? []
+
+            print("✅ Final pet count: \(self.lostPets.count)")
         }
     }
+
 }
+

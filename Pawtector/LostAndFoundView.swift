@@ -132,50 +132,56 @@ struct AnnounceLostPetView: View {
                                 .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                         )
                         .padding(.horizontal)
-
-                        LazyVGrid(columns: columns, spacing: 16) {
-                            ForEach(filteredPets) { pet in
-                                Button {
-                                    selectedPet = pet
-                                    isShowingDetail = true
-                                } label: {
-                                    VStack(spacing: 8) {
-                                        ZStack(alignment: .topLeading) {
-                                            Image(pet.imageName)
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(height: 140)
-                                                .clipped()
-                                                .cornerRadius(16)
-
-                                            Text("Reward \(pet.reward)")
-                                                .font(.caption2)
-                                                .fontWeight(.bold)
-                                                .padding(.horizontal, 8)
-                                                .padding(.vertical, 4)
-                                                .background(Color(hex: "#FBDC96"))
-                                                .cornerRadius(10)
-                                                .padding(6)
+                        if lostReportModel.lostPets.isEmpty {
+                            Text("No lost pets found.")
+                                .foregroundColor(.gray)
+                                .padding()
+                        }
+                        else {
+                            LazyVGrid(columns: columns, spacing: 16) {
+                                ForEach(filteredPets) { pet in
+                                    Button {
+                                        selectedPet = pet
+                                        isShowingDetail = true
+                                    } label: {
+                                        VStack(spacing: 8) {
+                                            ZStack(alignment: .topLeading) {
+                                                Image(pet.imageName)
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(height: 140)
+                                                    .clipped()
+                                                    .cornerRadius(16)
+                                                
+                                                Text("Reward \(pet.reward)")
+                                                    .font(.caption2)
+                                                    .fontWeight(.bold)
+                                                    .padding(.horizontal, 8)
+                                                    .padding(.vertical, 4)
+                                                    .background(Color(hex: "#FBDC96"))
+                                                    .cornerRadius(10)
+                                                    .padding(6)
+                                            }
+                                            
+                                            VStack(spacing: 2) {
+                                                Text(pet.name)
+                                                    .font(.subheadline)
+                                                    .fontWeight(.bold)
+                                                
+                                                Text("\(pet.breed), \(formattedAge(pet.age))")
+                                                    .font(.caption)
+                                                    .foregroundColor(.gray)
+                                            }
                                         }
-
-                                        VStack(spacing: 2) {
-                                            Text(pet.name)
-                                                .font(.subheadline)
-                                                .fontWeight(.bold)
-
-                                            Text("\(pet.breed), \(formattedAge(pet.age))")
-                                                .font(.caption)
-                                                .foregroundColor(.gray)
-                                        }
+                                        .padding(8)
+                                        .background(Color.white)
+                                        .cornerRadius(16)
+                                        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                                     }
-                                    .padding(8)
-                                    .background(Color.white)
-                                    .cornerRadius(16)
-                                    .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                                 }
                             }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     }
                     .padding(.bottom, 40)
                 }
@@ -528,7 +534,7 @@ struct ReportLostView: View {
 }
 
 
-
 #Preview {
     LostAndFoundView()
+        .environmentObject(LostReportModel())
 }
