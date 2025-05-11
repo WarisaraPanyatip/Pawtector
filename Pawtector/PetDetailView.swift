@@ -134,11 +134,4 @@ struct PetDetailView: View {
     }
 }
 
-// MARK: – Preview
-struct PetDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationStack {
-            PetDetailView(pet: Pet.sampleData[0])
-        }
-    }
-}
+

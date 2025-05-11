@@ -1,8 +1,11 @@
 import SwiftUI
+import FirebaseAuth
 
 struct MainTabView: View {
     @State private var selectedTab: Int = 0
-    @State private var favorites: Set<UUID> = []
+    @State private var favorites: Set<String> = []
+    @StateObject private var petViewModel = PetViewModel()
+    @State private var sessionManager = SessionManager()
 
     var body: some View {
         ZStack {
@@ -11,40 +14,39 @@ struct MainTabView: View {
                 case 0:
                     NavigationStack {
                         HomePageView(
-                            pets: Pet.sampleData,
+                            pets: petViewModel.pets,
                             favorites: $favorites,
                             selectedTab: $selectedTab
                         )
-                        .environmentObject(SessionManager())
+                        .environmentObject(sessionManager)
                     }
+
                 case 1:
                     NavigationStack {
-                        FavoriteView(
-                            pets: Pet.sampleData,
-                            favorites: $favorites,
-                            selectedTab: $selectedTab
-                        )
-                    }
+                            FavoriteView(
+                                pets: petViewModel.pets,
+                                favorites: $favorites,
+                                selectedTab: $selectedTab
+                            )
+                        }
                 case 2:
                     NavigationStack {
                         ReportStraytView()
                     }
-                case 3:
-                    NavigationStack {
-                        LostAndFoundView()
-                    }
+
                 case 4:
                     NavigationStack {
                         ProfileView()
                     }
+
                 default:
                     NavigationStack {
                         HomePageView(
-                            pets: Pet.sampleData,
+                            pets: petViewModel.pets,
                             favorites: $favorites,
                             selectedTab: $selectedTab
                         )
-                        .environmentObject(SessionManager())
+                        .environmentObject(sessionManager)
                     }
                 }
             }
@@ -57,5 +59,15 @@ struct MainTabView: View {
             }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
+        .onAppear {
+            loadFavoritesForCurrentUser()
+        }
+    }
+
+    private func loadFavoritesForCurrentUser() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        UserService().fetchFavorites(for: uid) { petIDs in
+            favorites = Set(petIDs)
+        }
     }
 }

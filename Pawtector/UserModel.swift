@@ -7,4 +7,5 @@ struct UserModel: Identifiable, Codable {
     let username: String
     let phone: String
     let createdAt: Date
+    var favorites: [String] = []
 }

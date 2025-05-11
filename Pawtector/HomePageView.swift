@@ -1,9 +1,6 @@
 import SwiftUI
+import FirebaseAuth
 
-
-
-
-/// PET TILE VIEW ////////
 
 struct PetTileView: View {
     let pet: Pet
@@ -33,7 +30,8 @@ struct PetTileView: View {
                     } label: {
                         Text("More")
                             .font(.caption2).bold()
-                            .padding(.vertical, 4).padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 8)
                             .background(Color.brandBlue)
                             .foregroundColor(.white)
                             .cornerRadius(6)
@@ -46,6 +44,7 @@ struct PetTileView: View {
             .cornerRadius(16)
             .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
 
+            // ❤️ Heart Button
             Button(action: onFavoriteTap) {
                 Image(systemName: isFavorite ? "heart.fill" : "heart")
                     .foregroundColor(isFavorite ? .red : .brandBlue)
@@ -55,6 +54,7 @@ struct PetTileView: View {
                     .shadow(radius: 2)
             }
             .offset(x: -12, y: 12)
+            .buttonStyle(PlainButtonStyle())
         }
     }
 
@@ -68,38 +68,32 @@ struct PetTileView: View {
     }
 }
 
-
-
-///////HOMEPAGE VIEW///////
-
-
 struct HomePageView: View {
     let pets: [Pet]
     @EnvironmentObject var session: SessionManager
-    @Binding var favorites: Set<UUID>
+    @Binding var favorites: Set<String>
     @Binding var selectedTab: Int
-    
-    // Filter & temp filter states
-    @State private var filterTypes       = Set<String>()
-    @State private var filterGenders     = Set<String>()
-    @State private var vaccinatedOnly    = false
-    @State private var sterilizedOnly    = false
-    @State private var ageValue          = 0
-    @State private var ageUnit: AgeUnit  = .year
-    @State private var selectedColor     = "Any"
-    @State private var selectedCity      = "Any"
-    @State private var tempFilterTypes   = Set<String>()
+
+    @State private var filterTypes = Set<String>()
+    @State private var filterGenders = Set<String>()
+    @State private var vaccinatedOnly = false
+    @State private var sterilizedOnly = false
+    @State private var ageValue = 0
+    @State private var ageUnit: AgeUnit = .year
+    @State private var selectedColor = "Any"
+    @State private var selectedCity = "Any"
+    @State private var tempFilterTypes = Set<String>()
     @State private var tempFilterGenders = Set<String>()
     @State private var tempVaccinatedOnly = false
     @State private var tempSterilizedOnly = false
-    @State private var tempAgeValue      = 0
+    @State private var tempAgeValue = 0
     @State private var tempAgeUnit: AgeUnit = .year
     @State private var tempSelectedColor = "Any"
-    @State private var tempSelectedCity  = "Any"
+    @State private var tempSelectedCity = "Any"
     @State private var showFilter = false
-    
+
     private let columns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
-    
+
     private var filteredPets: [Pet] {
         pets.filter { pet in
             (filterTypes.isEmpty || filterTypes.contains(pet.type)) &&
@@ -112,10 +106,7 @@ struct HomePageView: View {
     }
 
     private func ageMatches(_ pet: Pet) -> Bool {
-        if ageValue == 0 {
-            return true // No filter
-        }
-
+        if ageValue == 0 { return true }
         switch ageUnit {
         case .year:
             return Int(round(pet.ageDescription)) == ageValue
@@ -125,9 +116,6 @@ struct HomePageView: View {
         }
     }
 
-
-
-    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -139,12 +127,18 @@ struct HomePageView: View {
                             ForEach(filteredPets) { pet in
                                 PetTileView(
                                     pet: pet,
-                                    isFavorite: favorites.contains(pet.id),
+                                    isFavorite: favorites.contains(pet.pid),
                                     onFavoriteTap: {
-                                        if favorites.contains(pet.id) {
-                                            favorites.remove(pet.id)
+                                        let wasFavorite = favorites.contains(pet.pid)
+
+                                        if wasFavorite {
+                                            favorites.remove(pet.pid)
                                         } else {
-                                            favorites.insert(pet.id)
+                                            favorites.insert(pet.pid)
+                                        }
+
+                                        if let uid = session.currentUser?.uid {
+                                            UserService().updateFavorite(for: uid, petID: pet.pid, isAdding: !wasFavorite)
                                         }
                                     }
                                 )
@@ -154,7 +148,6 @@ struct HomePageView: View {
                         .padding(.bottom, 8)
                     }
                 }
-                
                 .sheet(isPresented: $showFilter) {
                     FilterPopupView(
                         filterTypes: $tempFilterTypes,
@@ -166,60 +159,56 @@ struct HomePageView: View {
                         selectedColor: $tempSelectedColor,
                         selectedCity: $tempSelectedCity
                     ) {
-                        filterTypes       = tempFilterTypes
-                        filterGenders     = tempFilterGenders
-                        vaccinatedOnly    = tempVaccinatedOnly
-                        sterilizedOnly    = tempSterilizedOnly
-                        ageValue          = tempAgeValue
-                        ageUnit           = tempAgeUnit
-                        selectedColor     = tempSelectedColor
-                        selectedCity      = tempSelectedCity
-                        showFilter        = false
+                        filterTypes = tempFilterTypes
+                        filterGenders = tempFilterGenders
+                        vaccinatedOnly = tempVaccinatedOnly
+                        sterilizedOnly = tempSterilizedOnly
+                        ageValue = tempAgeValue
+                        ageUnit = tempAgeUnit
+                        selectedColor = tempSelectedColor
+                        selectedCity = tempSelectedCity
+                        showFilter = false
                     }
                 }
             }
             .navigationBarHidden(true)
         }
     }
-    ////////header ///////
+
     private var header: some View {
         HStack {
             ZStack {
-
-                Image("logo_black") // Use the name you gave the asset
+                Image("logo_black")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 24, height: 24) // Adjust size as needed
+                    .frame(width: 24, height: 24)
             }
-            
+
             VStack(alignment: .trailing, spacing: 8) {
-                // Greeting section
                 HStack {
                     Spacer()
                     VStack(alignment: .trailing, spacing: 4) {
                         Text("Hi, \(session.currentUser?.username ?? "Friend")")
                             .font(.system(size: 24, weight: .bold))
                             .foregroundColor(.black)
-                        
+
                         Text("choose your lovely pet !")
                             .font(.system(size: 14, weight: .bold))
                             .foregroundColor(.brandBrown)
                     }
                 }
-                
-                // Filter button row
+
                 HStack {
                     Spacer()
                     Button {
-                        // Copy current filters to temp filters
-                        tempFilterTypes     = filterTypes
-                        tempFilterGenders   = filterGenders
-                        tempVaccinatedOnly  = vaccinatedOnly
-                        tempSterilizedOnly  = sterilizedOnly
-                        tempAgeValue        = ageValue
-                        tempAgeUnit         = ageUnit
-                        tempSelectedColor   = selectedColor
-                        tempSelectedCity    = selectedCity
+                        tempFilterTypes = filterTypes
+                        tempFilterGenders = filterGenders
+                        tempVaccinatedOnly = vaccinatedOnly
+                        tempSterilizedOnly = sterilizedOnly
+                        tempAgeValue = ageValue
+                        tempAgeUnit = ageUnit
+                        tempSelectedColor = selectedColor
+                        tempSelectedCity = selectedCity
                         showFilter.toggle()
                     } label: {
                         Image(systemName: "line.3.horizontal.decrease.circle.fill")
@@ -227,16 +216,9 @@ struct HomePageView: View {
                             .foregroundColor(.brandBrown)
                     }
                 }
-            
             }
             .padding(.horizontal)
             .padding(.top)
         }
     }
 }
-
-            
-            
-            
-
-            
