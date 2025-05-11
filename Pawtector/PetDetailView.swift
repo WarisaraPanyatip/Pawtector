@@ -11,19 +11,19 @@ struct PetDetailView: View {
         ScrollView {
             VStack(spacing: 24) {
 
-                // MARK: – Pet Image
+                // Pet Image
                 Image(pet.imageName)
                     .resizable()
                     .scaledToFill()
                     .frame(height: 300)
                     .clipped()
 
-                // MARK: – Pet Name
+                // Pet Name
                 Text(pet.name)
                     .font(.system(size: 32, weight: .bold))
                     .foregroundColor(.brandBrown)
 
-                // MARK: – Info Chips: Type, Age, Gender
+                // Info Chips: Type, Age, Gender
                 HStack(spacing: 16) {
                     infoChip(icon: "pawprint.fill", text: pet.type)
                     infoChip(icon: "calendar", text: formattedAge(pet.ageDescription))
@@ -36,31 +36,15 @@ struct PetDetailView: View {
                         .fill(Color(.systemGray6))
                 )
 
-                // MARK: – Detail Blocks
+                // Detail Blocks
                 VStack(spacing: 16) {
-                    detailBlock(
-                        icon: "map.fill",
-                        title: "Background",
-                        text: pet.background
-                    )
-                    detailBlock(
-                        icon: "smiley.fill",
-                        title: "Personality",
-                        text: pet.personality
-                    )
-                    detailBlock(
-                        icon: "heart.fill",
-                        title: "Health Status",
-                        text: pet.healthStatus
-                    )
-                    detailBlock(
-                        icon: "pawprint.circle.fill",
-                        title: "Training Status",
-                        text: pet.trainingStatus
-                    )
+                    detailBlock(icon: "map.fill", title: "Background", text: pet.background)
+                    detailBlock(icon: "smiley.fill", title: "Personality", text: pet.personality)
+                    detailBlock(icon: "heart.fill", title: "Health Status", text: pet.healthStatus)
+                    detailBlock(icon: "pawprint.circle.fill", title: "Training Status", text: pet.trainingStatus)
                 }
 
-                // MARK: – Contact Foundation Button
+                // Request Button
                 Button {
                     showAdopt = true
                 } label: {
@@ -73,14 +57,14 @@ struct PetDetailView: View {
                         .cornerRadius(12)
                 }
                 .disabled(requestSent)
+                .sheet(isPresented: $showAdopt) {
+                    RequestAdoptionView(requestSent: $requestSent, petId: pet.pid)
+                }
             }
             .padding()
         }
         .navigationTitle("Pet Details")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showAdopt) {
-            RequestAdoptionView(requestSent: $requestSent)
-        }
         .onChange(of: requestSent) { sent in
             if sent {
                 navDismiss()
@@ -123,7 +107,7 @@ struct PetDetailView: View {
         )
     }
 
-    // MARK: – Helper: Format Age
+    // MARK: – Age Formatter
     private func formattedAge(_ age: Float) -> String {
         if age < 1 {
             let months = Int(round(age * 12))
@@ -133,5 +117,3 @@ struct PetDetailView: View {
         }
     }
 }
-
-
