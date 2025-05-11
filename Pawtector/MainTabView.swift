@@ -6,6 +6,7 @@ struct MainTabView: View {
     @State private var favorites: Set<String> = []
     @StateObject private var petViewModel = PetViewModel()
     @State private var sessionManager = SessionManager()
+    @StateObject private var lostReportModel = LostReportModel()
 
     var body: some View {
         ZStack {
@@ -33,7 +34,11 @@ struct MainTabView: View {
                     NavigationStack {
                         ReportStraytView()
                     }
-
+                case 3:
+                    NavigationStack {
+                        LostAndFoundView()
+                            .environmentObject(lostReportModel)
+                    }
                 case 4:
                     NavigationStack {
                         ProfileView()
