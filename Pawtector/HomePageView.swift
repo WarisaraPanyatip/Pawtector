@@ -96,6 +96,7 @@ struct HomePageView: View {
 
     private var filteredPets: [Pet] {
         pets.filter { pet in
+            !pet.status &&
             (filterTypes.isEmpty || filterTypes.contains(pet.type)) &&
             (filterGenders.isEmpty || filterGenders.contains(pet.gender)) &&
             (!vaccinatedOnly || pet.healthStatus.localizedCaseInsensitiveContains("vaccinated")) &&
@@ -180,8 +181,8 @@ struct HomePageView: View {
             ZStack {
                 Image("logo_black")
                     .resizable()
-                    .scaledToFit()
-                    .frame(width: 24, height: 24)
+                    .frame(width: 60, height: 60)
+                    .padding(.leading, 16)
             }
 
             VStack(alignment: .trailing, spacing: 8) {

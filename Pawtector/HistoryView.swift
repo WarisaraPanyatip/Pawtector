@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct HistoryView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var lostReportModel = LostReportModel()
     @StateObject private var strayReportViewModel = StrayReportViewModel()
 
@@ -9,6 +10,18 @@ struct HistoryView: View {
             VStack(spacing: 0) {
                 // Header Section
                 HStack {
+                        Button(action: {
+                            dismiss()  // 👈 Dismiss HistoryView and go back to ProfileView
+                        }) {
+                            Image(systemName: "chevron.left")
+                                .font(.title2)
+                                .foregroundColor(.brandBrown)
+                                .padding(8)
+                                .background(Color.white)
+                                .clipShape(Circle())
+                        }
+
+                        Spacer()
                     Image("logo_black")
                         .resizable()
                         .frame(width: 60, height: 60)
