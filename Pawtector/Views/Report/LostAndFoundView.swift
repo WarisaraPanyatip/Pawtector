@@ -1,235 +1,172 @@
 import SwiftUI
 import FirebaseStorage
 
-// MARK: - LostAndFoundView
 struct LostAndFoundView: View {
     @StateObject private var lostReportModel = LostReportModel()
-    @StateObject private var sessionManager = SessionManager()
-    var body: some View {
-        NavigationStack {
-            AnnounceLostPetView()
-        }
-    }
-}
-
-
-// MARK: - AnnounceLostPetView
-struct AnnounceLostPetView: View {
-    @EnvironmentObject var lostReportModel: LostReportModel
-    @State private var isShowingDetail = false
-    @State private var selectedPet: LostPet? = nil
-    @State private var selectedTab = 0
     @State private var searchText = ""
-    @Namespace private var tabAnimation
+    @State private var selectedTab = 0
+    @Namespace private var tabNamespace
 
-    let columns = [GridItem(.flexible()), GridItem(.flexible())]
+    private let columns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
 
     var filteredPets: [LostPet] {
         if searchText.isEmpty {
             return lostReportModel.lostPets
         } else {
             return lostReportModel.lostPets.filter {
-                $0.name.localizedCaseInsensitiveContains(searchText)
-                || $0.breed.localizedCaseInsensitiveContains(searchText)
-                || $0.type.localizedCaseInsensitiveContains(searchText)
+                $0.name.localizedCaseInsensitiveContains(searchText) ||
+                $0.breed.localizedCaseInsensitiveContains(searchText)
             }
         }
     }
 
     var body: some View {
-        // MARK: - Header
-        ZStack(alignment: .top) {
-            Color.brandYellow
-                .opacity(0.2)
-                .ignoresSafeArea(edges: .top)
-                .frame(height: 90) // Increased height for spacing
-            
-            HStack {
-                Image("logo_black")
-                    .resizable()
-                    .frame(width: 60, height: 60)
-                    .padding(.leading)
-                
-                Spacer()
-                
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text("Lost & Found")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.brandBrown)
-                    
-                    Text("help them find the way home")
-                        .font(.system(size: 14))
-                        .foregroundColor(.brandBrown)
-                }
-                .padding(.trailing)
-            }
-            .padding(.top, 20) // Push content up closer to status bar
-            .padding(.horizontal)
-        }
-        VStack(spacing: 0) {
-            // Header
-            VStack(spacing: 6) {
+        NavigationStack {
+            VStack(spacing: 0) {
+                header
 
-                // Tabs with animation
-                HStack {
-                    Button(action: {
-                        withAnimation(.easeInOut) {
-                            selectedTab = 0
-                        }
-                    }) {
-                        VStack(spacing: 2) {
-                            Text("Lost Pet")
-                                .font(.subheadline)
-                                .fontWeight(.bold)
-                                .foregroundColor(selectedTab == 0 ? .white : .white.opacity(0.7))
-
-                            if selectedTab == 0 {
-                                RoundedRectangle(cornerRadius: 2)
-                                    .fill(Color.white)
-                                    .frame(height: 2)
-                                    .matchedGeometryEffect(id: "tabUnderline", in: tabAnimation)
-                            }
-                        }
-                    }
-
-                    Spacer()
-
-                    Button(action: {
-                        withAnimation(.easeInOut) {
-                            selectedTab = 1
-                        }
-                    }) {
-                        VStack(spacing: 2) {
-                            Text("Report Lost")
-                                .font(.subheadline)
-                                .fontWeight(.bold)
-                                .foregroundColor(selectedTab == 1 ? .white : .white.opacity(0.7))
-
-                            if selectedTab == 1 {
-                                RoundedRectangle(cornerRadius: 2)
-                                    .fill(Color.white)
-                                    .frame(height: 2)
-                                    .matchedGeometryEffect(id: "tabUnderline", in: tabAnimation)
-                            }
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.top, 4)
-            }
-            .padding(.bottom, 12)
-            .frame(maxWidth: .infinity)
-
-            // Main content
-            if selectedTab == 0 {
                 ScrollView {
-                    VStack(spacing: 16) {
-                        // Search
-                        HStack {
-                            Image(systemName: "magnifyingglass")
-                                .foregroundColor(.gray)
-
-                            TextField("Search by Name, Breed, or Pet Type", text: $searchText)
-                                .autocapitalization(.none)
-                                .disableAutocorrection(true)
-                        }
-                        .padding(.horizontal)
-                        .padding(.vertical, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white)
-                                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-                        )
-                        .padding(.horizontal)
-                        if lostReportModel.lostPets.isEmpty {
-                            Text("No lost pets found.")
-                                .foregroundColor(.gray)
-                                .padding()
-                        }
-                        else {
-                            LazyVGrid(columns: columns, spacing: 16) {
-                                ForEach(filteredPets) { pet in
-                                    Button {
-                                        selectedPet = pet
-                                        isShowingDetail = true
-                                    } label: {
-                                        VStack(spacing: 8) {
-                                            ZStack(alignment: .topLeading) {
-                                                AsyncImage(url: URL(string: pet.imageURL)) { phase in
-                                                    switch phase {
-                                                    case .empty:
-                                                        ProgressView()
-                                                            .frame(width: 240, height: 240)
-                                                    case .success(let image):
-                                                        image
-                                                            .resizable()
-                                                            .aspectRatio(contentMode: .fill)
-                                                            .frame(width: 240, height: 240)
-                                                            .clipShape(RoundedRectangle(cornerRadius: 25))
-                                                            .shadow(radius: 10)
-                                                    case .failure:
-                                                        Image("placeholder")
-                                                            .resizable()
-                                                            .aspectRatio(contentMode: .fill)
-                                                            .frame(width: 240, height: 240)
-                                                            .clipShape(RoundedRectangle(cornerRadius: 25))
-                                                            .shadow(radius: 10)
-                                                    @unknown default:
-                                                        EmptyView()
-                                                    }
-                                                }
-
-                                                
-                                                Text("Reward \(pet.reward)")
-                                                    .font(.caption2)
-                                                    .fontWeight(.bold)
-                                                    .padding(.horizontal, 8)
-                                                    .padding(.vertical, 4)
-                                                    .background(Color(hex: "#FBDC96"))
-                                                    .cornerRadius(10)
-                                                    .padding(6)
-                                            }
-                                            
-                                            VStack(spacing: 2) {
-                                                Text(pet.name)
-                                                    .font(.subheadline)
-                                                    .fontWeight(.bold)
-                                                
-                                                Text("\(pet.breed), \(formattedAge(pet.age))")
-                                                    .font(.caption)
-                                                    .foregroundColor(.gray)
-                                            }
-                                        }
-                                        .padding(8)
-                                        .background(Color.white)
-                                        .cornerRadius(16)
-                                        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
-                                    }
-                                }
+                    if selectedTab == 0 {
+                        LazyVGrid(columns: columns, spacing: 20) {
+                            ForEach(filteredPets) { pet in
+                                LostPetTileView(pet: pet)
                             }
-                            .padding(.horizontal)
                         }
-                    }
-                    .padding(.bottom, 40)
-                }
-                .sheet(isPresented: $isShowingDetail) {
-                    if let selectedPet = selectedPet {
-                        LostAndFoundDetailView(pet: selectedPet)
+                        .padding(.horizontal)
+                        .padding(.bottom, 16)
+                    } else {
+                        ReportLostView()
                     }
                 }
-            } else {
-                ReportLostView()
-                    .padding(.top)
             }
+            .onAppear {
+                lostReportModel.fetchLostReports()
+            }
+        }
+        .environmentObject(lostReportModel)
+    }
+
+    private var header: some View {
+        VStack(spacing: 0) {
+            ZStack(alignment: .top) {
+                Color.brandYellow
+                    .opacity(0.2)
+                    .ignoresSafeArea(edges: .top)
+                    .frame(height: 90)
+
+                VStack(spacing: 12) {
+                    HStack {
+                        Image("logo_black")
+                            .resizable()
+                            .frame(width: 60, height: 60)
+                            .padding(.leading)
+
+                        Spacer()
+
+                        VStack(alignment: .trailing, spacing: 4) {
+                            Text("Lost & Found")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(.brandBrown)
+
+                            Text("Announce lost pets to help them home")
+                                .font(.system(size: 14))
+                                .foregroundColor(.brandBrown)
+                        }
+                        .padding(.trailing)
+                    }
+                    .padding(.top, 20)
+                    .padding(.horizontal)
+                }
+            }
+
+            tabSelector
+
+            HStack {
+                TextField("Search pets by Name, Type, Breed", text: $searchText)
+                    .padding(8)
+                    .background(Color.white)
+                    .cornerRadius(10)
+                    .padding(.horizontal)
+            }
+            .padding(.top, 8)
         }
     }
 
-    private func formattedAge(_ age: Float) -> String {
-        if age < 1 {
-            let months = Int(round(age * 12))
-            return "\(months) month\(months == 1 ? "" : "s")"
-        } else {
-            return String(format: "%.1f year%@", age, age == 1.0 ? "" : "s")
+    private var tabSelector: some View {
+        HStack(spacing: 0) {
+            ForEach(["Lost Pets", "Report Lost"], id: \.self) { title in
+                let index = title == "Lost Pets" ? 0 : 1
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(selectedTab == index ? .brandBrown : .black)
+                    .padding(.vertical, 12)
+                    .frame(maxWidth: .infinity)
+                    .background(selectedTab == index ? Color(.systemGray5): Color.brandYellow.opacity(0.2))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .onTapGesture {
+                        withAnimation(.easeInOut) {
+                            selectedTab = index
+                        }
+                    }
+            }
+        }
+        .padding(.horizontal)
+        .padding(.top)
+    }
+}
+
+struct LostPetTileView: View {
+    let pet: LostPet
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            VStack(spacing: 0) {
+                let dogImages = ["ใบบัว", "โบ้", "เปียกปูน", "พละ", "อูโน่"]
+                let catImages = ["จี๊ด", "ส้มส้ม", "แหมว"]
+                let imageName = pet.type == "Dog" ? dogImages.randomElement()! : catImages.randomElement()!
+
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 120)
+                    .frame(maxWidth: .infinity)
+                    .clipped()
+
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(pet.name)
+                            .font(.headline)
+                        Text("\(pet.lastSeen)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    NavigationLink(destination: LostAndFoundDetailView(pet: pet)) {
+                        Text("View")
+                            .font(.caption2).bold()
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 8)
+                            .background(Color.brandBlue)
+                            .foregroundColor(.white)
+                            .cornerRadius(6)
+                    }
+                }
+                .padding(8)
+                .background(Color.white)
+            }
+            .background(Color.white)
+            .cornerRadius(16)
+            .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+
+            if !pet.reward.isEmpty {
+                Text("\u{0E3F}\(pet.reward)")
+                    .font(.caption2).bold()
+                    .padding(6)
+                    .background(Color.brown)
+                    .foregroundColor(.white)
+                    .clipShape(Capsule())
+                    .offset(x: -12, y: 12)
+            }
         }
     }
 }
