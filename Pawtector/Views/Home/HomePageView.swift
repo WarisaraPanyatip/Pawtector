@@ -6,7 +6,7 @@ struct PetTileView: View {
     let pet: Pet
     let isFavorite: Bool
     let onFavoriteTap: () -> Void
-
+    
     var body: some View {
         ZStack(alignment: .topTrailing) {
             VStack(spacing: 0) {
@@ -15,7 +15,7 @@ struct PetTileView: View {
                     .scaledToFill()
                     .frame(height: 120)
                     .clipped()
-
+                
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(pet.name)
@@ -43,7 +43,7 @@ struct PetTileView: View {
             .background(Color.white)
             .cornerRadius(16)
             .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
-
+            
             // ❤️ Heart Button
             Button(action: onFavoriteTap) {
                 Image(systemName: isFavorite ? "heart.fill" : "heart")
@@ -57,7 +57,7 @@ struct PetTileView: View {
             .buttonStyle(PlainButtonStyle())
         }
     }
-
+    
     private func formattedAge(_ age: Float) -> String {
         if age < 1 {
             let months = Int(round(age * 12))
@@ -121,10 +121,12 @@ struct HomePageView: View {
         NavigationStack {
             ZStack {
                 Color(.systemGray6).ignoresSafeArea()
+
                 VStack(spacing: 0) {
                     header
+
                     ScrollView {
-                        LazyVGrid(columns: columns, spacing: 16) {
+                        LazyVGrid(columns: columns, spacing: 20) {
                             ForEach(filteredPets) { pet in
                                 PetTileView(
                                     pet: pet,
@@ -146,7 +148,7 @@ struct HomePageView: View {
                             }
                         }
                         .padding(.horizontal)
-                        .padding(.bottom, 8)
+                        .padding(.bottom, 16)
                     }
                 }
                 .sheet(isPresented: $showFilter) {
@@ -176,50 +178,64 @@ struct HomePageView: View {
         }
     }
 
+    // MARK: - Header View
     private var header: some View {
-        HStack {
-            ZStack {
-                Image("logo_black")
-                    .resizable()
-                    .frame(width: 60, height: 60)
-                    .padding(.leading, 16)
-            }
+        VStack(spacing: 0) {
+            ZStack(alignment: .top) {
+                // Extended background
+                Color.brandYellow
+                    .opacity(0.5)
+                    .ignoresSafeArea(edges: .top)
+                    .frame(height: 110) // Increased height
 
-            VStack(alignment: .trailing, spacing: 8) {
-                HStack {
-                    Spacer()
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text("Hi, \(session.currentUser?.username ?? "Friend")")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundColor(.black)
+                VStack(spacing: 16) {
+                    HStack {
+                        Image("logo_black")
+                            .resizable()
+                            .frame(width: 40, height: 40) // Slightly smaller for balance
+                            .padding(.leading)
 
-                        Text("choose your lovely pet !")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.brandBrown)
+                        Spacer()
+
+                        VStack(alignment: .trailing, spacing: 4) {
+                            Text("Hi, \(session.currentUser?.username ?? "Friend")")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(.brandBrown)
+
+                            Text("choose your lovely pet !")
+                                .font(.system(size: 14))
+                                .foregroundColor(.brandBrown)
+                        }
+                        .padding(.trailing)
                     }
-                }
-
-                HStack {
-                    Spacer()
-                    Button {
-                        tempFilterTypes = filterTypes
-                        tempFilterGenders = filterGenders
-                        tempVaccinatedOnly = vaccinatedOnly
-                        tempSterilizedOnly = sterilizedOnly
-                        tempAgeValue = ageValue
-                        tempAgeUnit = ageUnit
-                        tempSelectedColor = selectedColor
-                        tempSelectedCity = selectedCity
-                        showFilter.toggle()
-                    } label: {
-                        Image(systemName: "line.3.horizontal.decrease.circle.fill")
-                            .font(.title2)
-                            .foregroundColor(.brandBrown)
-                    }
+                    .padding(.top, 30) // Pull up into the safe area
+                    .padding(.horizontal)
                 }
             }
-            .padding(.horizontal)
-            .padding(.top)
+
+            // Filter Button just below yellow area
+            HStack {
+                Spacer()
+                Button {
+                    tempFilterTypes = filterTypes
+                    tempFilterGenders = filterGenders
+                    tempVaccinatedOnly = vaccinatedOnly
+                    tempSterilizedOnly = sterilizedOnly
+                    tempAgeValue = ageValue
+                    tempAgeUnit = ageUnit
+                    tempSelectedColor = selectedColor
+                    tempSelectedCity = selectedCity
+                    showFilter.toggle()
+                } label: {
+                    Image(systemName: "line.3.horizontal.decrease.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.brandBrown)
+                }
+                .padding(.trailing)
+                .padding(.top, 8)
+            }
         }
     }
+
 }
+
