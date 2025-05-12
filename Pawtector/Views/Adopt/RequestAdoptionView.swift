@@ -7,7 +7,7 @@ struct RequestAdoptionView: View {
     @Binding var requestSent: Bool
 
     let petId: String
-
+    let petName: String 
     @State private var showingAlert = false
     @State private var sending = false
 
@@ -98,6 +98,7 @@ struct RequestAdoptionView: View {
             "rid": rid,
             "userId": user.uid,
             "petId": petId,
+            "petName": petName, // ✅ Save pet name
             "status": "pending",
             "timestamp": Timestamp(date: Date())
         ]
