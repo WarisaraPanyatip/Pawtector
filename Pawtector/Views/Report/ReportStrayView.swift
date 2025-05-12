@@ -23,9 +23,9 @@ struct ReportStrayView: View {
     ]
 
     var body: some View {
+        header
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                header
                 formSection
 
                 Button(action: submitReport) {
@@ -63,27 +63,37 @@ struct ReportStrayView: View {
     }
 
     private var header: some View {
-        HStack(alignment: .center) {
-            Image("logo_black")
-                .resizable()
-                .frame(width: 60, height: 60)
-                .padding(.leading, 16)
-
-            Spacer()
-
-            VStack(alignment: .trailing, spacing: 2) {
-                Text("Report a Stray")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.black)
-
-                Text("rescue them by SoiDog")
-                    .font(.footnote)
-                    .foregroundColor(Color.brown)
+        
+        // MARK: - Header
+        ZStack(alignment: .top) {
+            Color.brandYellow
+                .opacity(0.2)
+                .ignoresSafeArea(edges: .top)
+                .frame(height: 90) // Increased height for spacing
+            
+            HStack {
+                Image("logo_black")
+                    .resizable()
+                    .frame(width: 60, height: 60)
+                    .padding(.leading)
+                
+                Spacer()
+                
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("Report a Stray")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.brandBrown)
+                    
+                    Text("rescue them by SoiDog!")
+                        .font(.system(size: 14))
+                        .foregroundColor(.brandBrown)
+                }
+                .padding(.trailing)
             }
-            .padding(.trailing, 16)
+            .padding(.top, 20) // Push content up closer to status bar
+            .padding(.horizontal)
         }
-        .padding(.top, 16)
+        
     }
 
     private var formSection: some View {

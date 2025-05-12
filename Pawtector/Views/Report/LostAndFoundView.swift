@@ -37,51 +37,38 @@ struct AnnounceLostPetView: View {
     }
 
     var body: some View {
+        // MARK: - Header
+        ZStack(alignment: .top) {
+            Color.brandYellow
+                .opacity(0.2)
+                .ignoresSafeArea(edges: .top)
+                .frame(height: 90) // Increased height for spacing
+            
+            HStack {
+                Image("logo_black")
+                    .resizable()
+                    .frame(width: 60, height: 60)
+                    .padding(.leading)
+                
+                Spacer()
+                
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("Lost & Found")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.brandBrown)
+                    
+                    Text("help them find the way home")
+                        .font(.system(size: 14))
+                        .foregroundColor(.brandBrown)
+                }
+                .padding(.trailing)
+            }
+            .padding(.top, 20) // Push content up closer to status bar
+            .padding(.horizontal)
+        }
         VStack(spacing: 0) {
             // Header
             VStack(spacing: 6) {
-                HStack(alignment: .center) {
-                    Image("logo_white")
-                        .resizable()
-                        .frame(width: 60, height: 60)
-                        .padding(.leading, 16)
-
-                    Spacer()
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text("Lost & Found")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-
-                        Text("help them find the way home")
-                            .font(.footnote)
-                            .foregroundColor(Color(hex: "#FDBC33"))
-                    }
-                    .padding(.trailing, 16)
-                }
-                .padding(.top, 16)
-                
-//                HStack {
-//                    Image("logo_black")
-//                        .resizable()
-//                        .frame(width: 60, height: 60)
-//                        .padding(.leading)
-//                    
-//                    Spacer()
-//                    
-//                    VStack(alignment: .trailing, spacing: 4) {
-//                        Text("Lost & Found")
-//                            .font(.system(size: 24, weight: .bold))
-//                            .foregroundColor(.brandBrown)
-//                        
-//                        Text("help them find the way home")
-//                            .font(.system(size: 14))
-//                            .foregroundColor(.brandBrown)
-//                    }
-//                    .padding(.trailing)
-//                }
-//                .padding(.top, 20) // Push content up closer to status bar
-//                .padding(.horizontal)
 
                 // Tabs with animation
                 HStack {
@@ -132,7 +119,6 @@ struct AnnounceLostPetView: View {
             }
             .padding(.bottom, 12)
             .frame(maxWidth: .infinity)
-            .background(Color(hex: "#77BED1"))
 
             // Main content
             if selectedTab == 0 {

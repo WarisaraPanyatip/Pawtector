@@ -10,6 +10,7 @@ struct MainTabView: View {
 
     var body: some View {
         ZStack {
+            Color(.systemGray6).ignoresSafeArea() 
             Group {
                 switch selectedTab {
                 case 0:
