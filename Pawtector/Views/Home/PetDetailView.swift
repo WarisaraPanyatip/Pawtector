@@ -60,7 +60,8 @@ struct PetDetailView: View {
                 }
                 .disabled(requestSent)
                 .sheet(isPresented: $showAdopt) {
-                    RequestAdoptionView(requestSent: $requestSent, petId: pet.pid)
+                    RequestAdoptionView(requestSent: $requestSent, petId: pet.pid, petName: pet.name)
+
                 }
             }
             .padding()

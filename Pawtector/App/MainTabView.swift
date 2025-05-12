@@ -44,6 +44,8 @@ struct MainTabView: View {
                     NavigationStack {
                         ProfileView()
                     }
+                    .environmentObject(sessionManager)
+                    .environmentObject(petViewModel)
 
                 default:
                     NavigationStack {

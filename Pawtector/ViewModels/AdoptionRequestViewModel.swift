@@ -10,40 +10,60 @@ class AdoptionRequestViewModel: ObservableObject {
         db.collection("AdoptionRequest")
             .whereField("userId", isEqualTo: userId)
             .order(by: "timestamp", descending: true)
-            .getDocuments { snapshot, error in
+            .getDocuments { [weak self] snapshot, error in
                 if let error = error {
-                    print("Error fetching adoption requests: \(error.localizedDescription)")
+                    print("❌ Error fetching adoption requests: \(error.localizedDescription)")
                     return
                 }
 
-                print("Fetched adoption request docs:")
-                snapshot?.documents.forEach { doc in
-                    print(doc.documentID, doc.data())
+                guard let documents = snapshot?.documents else {
+                    print("⚠️ No adoption request documents found.")
+                    return
                 }
 
-                self.requests = snapshot?.documents.compactMap { doc in
+                var tempRequests: [AdoptionRequest] = []
+                let group = DispatchGroup()
+
+                for doc in documents {
                     let data = doc.data()
+
                     guard
                         let userId = data["userId"] as? String,
                         let petId = data["petId"] as? String,
                         let status = data["status"] as? String,
                         let timestamp = data["timestamp"] as? Timestamp
                     else {
-                        return nil
+                        print("⚠️ Skipping malformed document: \(doc.documentID)")
+                        continue
                     }
 
-                    // Use existing 'rid' if available, otherwise fall back to document ID
                     let rid = data["rid"] as? String ?? doc.documentID
+                    var petName = "Unknown Pet"
 
-                    return AdoptionRequest(
-                        id: doc.documentID,
-                        rid: rid,
-                        userId: userId,
-                        petId: petId,
-                        status: status,
-                        timestamp: timestamp.dateValue()
-                    )
-                } ?? []
+                    group.enter()
+                    self?.db.collection("StrayPet").document(petId).getDocument { petDoc, error in
+                        if let petData = petDoc?.data(), let name = petData["name"] as? String {
+                            petName = name
+                        }
+
+                        let request = AdoptionRequest(
+                            id: doc.documentID,
+                            rid: rid,
+                            userId: userId,
+                            petId: petId,
+                            petName: petName,
+                            status: status,
+                            timestamp: timestamp.dateValue()
+                        )
+
+                        tempRequests.append(request)
+                        group.leave()
+                    }
+                }
+
+                group.notify(queue: .main) {
+                    self?.requests = tempRequests
+                }
             }
     }
 }

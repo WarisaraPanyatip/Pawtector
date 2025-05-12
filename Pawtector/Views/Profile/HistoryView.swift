@@ -6,6 +6,7 @@ struct HistoryView: View {
     @StateObject private var strayReportViewModel = StrayReportViewModel()
     @StateObject private var requestViewModel = AdoptionRequestViewModel()
     @EnvironmentObject var session: SessionManager
+    @EnvironmentObject var petViewModel: PetViewModel
 
 
     var body: some View {
@@ -51,15 +52,29 @@ struct HistoryView: View {
                                 .foregroundColor(.gray)
                         } else {
                             ForEach(requestViewModel.requests) { request in
+                                // Match pet by ID
+                                let matchedPet = petViewModel.pets.first { $0.pid == request.petId }
+                                let petName = matchedPet?.name ?? "Unknown Pet"
+
                                 NavigationLink(destination: AdoptionRequestDetailView(request: request)) {
                                     VStack(alignment: .leading) {
-                                        Text("Pet ID: \(request.petId)")
+                                        Text("Pet: \(petName)")
                                         Text("Status: \(request.status.capitalized)")
                                             .font(.caption)
                                             .foregroundColor(.gray)
                                     }
                                 }
                             }
+                        }
+                    }
+                    .listStyle(.insetGrouped)
+                    .onAppear {
+                        petViewModel.fetchPets() // ✅ Fetch pets so names can be matched
+                        strayReportViewModel.fetchReports()
+                        lostReportModel.fetchLostReports()
+
+                        if let uid = session.currentUser?.uid {
+                            requestViewModel.fetchRequests(for: uid)
                         }
                     }
 
@@ -252,7 +267,9 @@ struct AdoptionRequestDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
-#Preview {
-    HistoryView()
-        .environmentObject(SessionManager())
-}
+//#Preview {
+//    HistoryView()
+//        .environmentObject(SessionManager())
+//}
+
+
