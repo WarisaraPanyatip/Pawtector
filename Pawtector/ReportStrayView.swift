@@ -1,6 +1,7 @@
 import SwiftUI
 import FirebaseFirestore
 import FirebaseAuth
+import FirebaseStorage
 
 struct ReportStraytView: View {
     @EnvironmentObject var session: SessionManager
@@ -12,8 +13,10 @@ struct ReportStraytView: View {
     @State private var isStillThere = false
     @State private var contact = ""
     @State private var imageName = "placeholder"
+    @State private var imageData: Data? = nil
     @State private var submitted = false
     @State private var isSubmitting = false
+    @State private var showImagePicker = false
 
     let conditionOptions = [
         "Injured", "Sick", "Starving", "Aggressive", "Can't Move", "Abandoned", "Other"
@@ -46,6 +49,9 @@ struct ReportStraytView: View {
                 .padding(.horizontal)
                 .padding(.bottom)
             }
+        }
+        .sheet(isPresented: $showImagePicker) {
+            ImagePicker(data: $imageData)
         }
         .alert(isPresented: $submitted) {
             Alert(
@@ -121,7 +127,7 @@ struct ReportStraytView: View {
                 .textFieldStyle(RoundedBorderTextFieldStyle())
 
             Button(action: {
-                // Upload photo logic here
+                showImagePicker = true
             }) {
                 Image(systemName: "camera")
                     .resizable()
@@ -141,34 +147,51 @@ struct ReportStraytView: View {
     }
 
     private func submitReport() {
-        guard let uid = session.currentUser?.uid else {
-            return
-        }
-
+        guard let uid = session.currentUser?.uid else { return }
         isSubmitting = true
-        let db = Firestore.firestore()
+
         let sid = UUID().uuidString
 
-        let newReport: [String: Any] = [
-            "sid": sid,
-            "petType": petType,
-            "condition": condition,
-            "description": description,
-            "location": location,
-            "dateTime": dateTime,
-            "isStillThere": isStillThere,
-            "contact": contact,
-            "imageName": imageName,
-            "user_id": uid,
-            "createdAt": Timestamp(date: Date())
-        ]
+        func saveToFirestore(imageURL: String) {
+            let db = Firestore.firestore()
+            let newReport: [String: Any] = [
+                "sid": sid,
+                "petType": petType,
+                "condition": condition,
+                "description": description,
+                "location": location,
+                "dateTime": dateTime,
+                "isStillThere": isStillThere,
+                "contact": contact,
+                "imageName": imageURL,
+                "user_id": uid,
+                "createdAt": Timestamp(date: Date())
+            ]
 
-        db.collection("StrayReport").document(sid).setData(newReport) { error in
-            isSubmitting = false
-            submitted = true
+            db.collection("StrayReport").document(sid).setData(newReport) { error in
+                isSubmitting = false
+                submitted = true
+            }
+        }
+
+        if let imageData = imageData {
+            let ref = Storage.storage().reference().child("stray_images/\(sid).jpg")
+            ref.putData(imageData, metadata: nil) { _, error in
+                if let error = error {
+                    print("❌ Image upload failed: \(error.localizedDescription)")
+                    saveToFirestore(imageURL: "")
+                } else {
+                    ref.downloadURL { url, error in
+                        saveToFirestore(imageURL: url?.absoluteString ?? "")
+                    }
+                }
+            }
+        } else {
+            saveToFirestore(imageURL: "")
         }
     }
 }
+
 
 #Preview {
     ReportStraytView()
