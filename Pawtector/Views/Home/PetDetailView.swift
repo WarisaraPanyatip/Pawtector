@@ -28,6 +28,7 @@ struct PetDetailView: View {
                     infoChip(icon: "pawprint.fill", text: pet.type)
                     infoChip(icon: "calendar", text: formattedAge(pet.ageDescription))
                     infoChip(icon: pet.gender == "Male" ? "m.circle" : "f.circle", text: pet.gender)
+                    infoChip(icon: "dot.radiowaves.left.and.right", text: pet.breed) // ✅ Add this line
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
@@ -74,15 +75,20 @@ struct PetDetailView: View {
 
     // MARK: – Reusable Info Chip
     private func infoChip(icon: String, text: String) -> some View {
-        HStack {
+        VStack(spacing: 4) {
             Image(systemName: icon)
+                .font(.body)
                 .foregroundColor(.brandBlue)
+            
             Text(text)
-                .font(.subheadline).bold()
+                .font(.caption)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true) // Allow wrapping
         }
         .padding(8)
+        .frame(minWidth: 70, maxWidth: 80, minHeight: 60)
         .background(
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.brandBrown, lineWidth: 1)
         )
     }
