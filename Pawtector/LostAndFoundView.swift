@@ -3,6 +3,7 @@ import SwiftUI
 // MARK: - LostAndFoundView
 struct LostAndFoundView: View {
     @StateObject private var lostReportModel = LostReportModel()
+    @StateObject private var sessionManager = SessionManager()
     var body: some View {
         NavigationStack {
             AnnounceLostPetView()
@@ -329,6 +330,7 @@ import SwiftUI
 import FirebaseFirestore
 
 struct ReportLostView: View {
+    @EnvironmentObject var session: SessionManager
     @EnvironmentObject var lostReportModel: LostReportModel
     @State private var selectedPetType = "Dog"
     @State private var petName = ""
@@ -479,9 +481,18 @@ struct ReportLostView: View {
     private func submitReport() {
         isSubmitting = true
 
+        guard let userID = session.currentUser?.uid else {
+            alertMessage = "You must be logged in to submit a report."
+            showAlert = true
+            isSubmitting = false
+            return
+        }
+
         let db = Firestore.firestore()
         let newID = UUID().uuidString
+
         let newReport: [String: Any] = [
+            "user_id": userID,
             "pid": newID,
             "name": petName,
             "type": selectedPetType,
@@ -508,11 +519,12 @@ struct ReportLostView: View {
             } else {
                 alertMessage = "Report submitted successfully."
                 resetForm()
+                lostReportModel.fetchLostReports()
             }
             showAlert = true
-            lostReportModel.fetchLostReports()
         }
     }
+
 
     private func resetForm() {
         petName = ""
@@ -536,5 +548,6 @@ struct ReportLostView: View {
 
 #Preview {
     LostAndFoundView()
+        .environmentObject(SessionManager())
         .environmentObject(LostReportModel())
 }

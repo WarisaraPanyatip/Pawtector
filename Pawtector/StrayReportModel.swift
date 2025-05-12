@@ -1,18 +1,17 @@
-//
-//  StrayReportModel.swift
-//  Pawtector
-//
-//  Created by Piyathida Changsuwan on 12/5/2568 BE.
-//
+import Foundation
 
-import SwiftUI
+struct StrayReport: Identifiable {
+    var id: String { sid }
 
-struct StrayReportModel: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
-
-#Preview {
-    StrayReportModel()
+    let sid: String
+    let petType: String
+    let condition: String
+    let description: String
+    let location: String
+    let dateTime: String
+    let isStillThere: Bool
+    let contact: String
+    let imageName: String
+    let user_id: String
+    let createdAt: Date
 }

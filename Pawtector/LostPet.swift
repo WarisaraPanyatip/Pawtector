@@ -4,6 +4,7 @@ struct LostPet: Identifiable {
     var id: String { pid }
 
     let pid: String
+    let user_id: String 
     let name: String
     let type: String
     let breed: String

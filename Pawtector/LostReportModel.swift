@@ -6,8 +6,11 @@ class LostReportModel: ObservableObject {
 
     private let db = Firestore.firestore()
 
+    init() {
+        fetchLostReports()
+    }
+
     func fetchLostReports() {
-        let db = Firestore.firestore()
         db.collection("LostReport").getDocuments { snapshot, error in
             if let error = error {
                 print("❌ Error fetching lost reports: \(error.localizedDescription)")
@@ -21,11 +24,12 @@ class LostReportModel: ObservableObject {
                 print("🔍 Document: \(data)")
 
                 guard let pid = data["pid"] as? String,
+                      let user_id = data["user_id"] as? String,
                       let name = data["name"] as? String,
                       let type = data["type"] as? String,
                       let breed = data["breed"] as? String,
                       let gender = data["gender"] as? String,
-                      let ageValue = data["age"] as? Double, // ← allow Double from Firestore
+                      let ageValue = data["age"] as? Double,
                       let imageName = data["imageName"] as? String,
                       let healthStatus = data["healthStatus"] as? String,
                       let personality = data["personality"] as? String,
@@ -44,6 +48,7 @@ class LostReportModel: ObservableObject {
 
                 return LostPet(
                     pid: pid,
+                    user_id: user_id,
                     name: name,
                     type: type,
                     breed: breed,
@@ -66,6 +71,4 @@ class LostReportModel: ObservableObject {
             print("✅ Final pet count: \(self.lostPets.count)")
         }
     }
-
 }
-

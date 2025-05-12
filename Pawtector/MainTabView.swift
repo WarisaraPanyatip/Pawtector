@@ -38,6 +38,7 @@ struct MainTabView: View {
                     NavigationStack {
                         LostAndFoundView()
                             .environmentObject(lostReportModel)
+                            .environmentObject(sessionManager)
                     }
                 case 4:
                     NavigationStack {
