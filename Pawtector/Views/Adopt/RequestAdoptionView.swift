@@ -67,7 +67,10 @@ struct RequestAdoptionView: View {
         let docId = "\(user.uid)_\(petId)"
         let db = Firestore.firestore()
 
+        let rid = UUID().uuidString
+
         let requestData: [String: Any] = [
+            "rid": rid, // ✅ Add this
             "userId": user.uid,
             "petId": petId,
             "status": "pending",
