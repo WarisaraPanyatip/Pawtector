@@ -5,172 +5,238 @@ import FirebaseStorage
 
 struct ReportStrayView: View {
     @EnvironmentObject var session: SessionManager
+
     @State private var petType = "Dog"
-    @State private var condition = ""
+    @State private var selectedConditions: [String] = []
     @State private var description = ""
     @State private var location = ""
-    @State private var dateTime = ""
+    @State private var dateTime = Date()
     @State private var isStillThere = false
     @State private var contact = ""
-    @State private var imageName = "placeholder"
     @State private var imageData: Data? = nil
-    @State private var submitted = false
-    @State private var isSubmitting = false
     @State private var showImagePicker = false
+    @State private var isSubmitting = false
+    @State private var showAlert = false
+    @State private var alertMessage = ""
 
-    let conditionOptions = [
-        "Injured", "Sick", "Starving", "Aggressive", "Can't Move", "Abandoned", "Other"
-    ]
+    let conditionOptions = ["Injured", "Sick", "Starving", "Aggressive", "Can't Move", "Abandoned", "Other"]
 
     var body: some View {
-        header
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                formSection
-
-                Button(action: submitReport) {
-                    if isSubmitting {
-                        ProgressView()
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.gray)
-                            .cornerRadius(12)
-                    } else {
-                        Text("Submit Report")
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color(hex: "#E74C3C"))
-                            .cornerRadius(12)
-                    }
+        VStack(spacing: 0) {
+            header
+            ScrollView {
+                VStack(spacing: 32) {
+                    petDetailsSection
+                    conditionLocationSection
+                    contactSubmitSection
                 }
-                .disabled(isSubmitting)
-                .padding(.horizontal)
-                .padding(.bottom)
+                .padding(.top)
             }
         }
         .sheet(isPresented: $showImagePicker) {
             ImagePicker(data: $imageData)
         }
-        .alert(isPresented: $submitted) {
-            Alert(
-                title: Text("Thank you"),
-                message: Text("Your report has been sent to the rescue team."),
-                dismissButton: .default(Text("OK"))
-            )
+        .alert("Report Status", isPresented: $showAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(alertMessage)
         }
     }
 
     private var header: some View {
-        
-        // MARK: - Header
         ZStack(alignment: .top) {
-            Color.brandYellow
-                .opacity(0.2)
+            Color.brandYellow.opacity(0.2)
                 .ignoresSafeArea(edges: .top)
-                .frame(height: 90) // Increased height for spacing
-            
+                .frame(height: 90)
+
             HStack {
                 Image("logo_black")
                     .resizable()
                     .frame(width: 60, height: 60)
                     .padding(.leading)
-                
+
                 Spacer()
-                
+
                 VStack(alignment: .trailing, spacing: 4) {
                     Text("Report a Stray")
                         .font(.system(size: 24, weight: .bold))
                         .foregroundColor(.brandBrown)
-                    
-                    Text("rescue them by SoiDog!")
+
+                    Text("Rescue them with SoiDog")
                         .font(.system(size: 14))
                         .foregroundColor(.brandBrown)
                 }
                 .padding(.trailing)
             }
-            .padding(.top, 20) // Push content up closer to status bar
+            .padding(.top, 20)
             .padding(.horizontal)
         }
-        
     }
 
-    private var formSection: some View {
+    private var petDetailsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Picker("Pet Type", selection: $petType) {
-                Text("Cat").tag("Cat")
-                Text("Dog").tag("Dog")
-            }
-            .pickerStyle(SegmentedPickerStyle())
+            Text("Pet Details").font(.headline)
 
-            Menu {
-                ForEach(conditionOptions, id: \.self) { option in
-                    Button(option) {
-                        condition = option
+            HStack {
+                ForEach(["Dog", "Cat"], id: \.self) { type in
+                    Button(action: {
+                        petType = type
+                    }) {
+                        Text(type)
+                            .fontWeight(.medium)
+                            .padding()
+                            .background(petType == type ? Color.brandYellow : Color(.systemGray5))
+                            .cornerRadius(12)
+                            .foregroundColor(.black)
                     }
                 }
-            } label: {
-                HStack {
-                    Text(condition.isEmpty ? "Select condition" : condition)
-                    Spacer()
-                    Image(systemName: "chevron.down")
-                }
-                .padding()
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(8)
             }
 
-            TextEditor(text: $description)
-                .frame(height: 100)
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2), lineWidth: 1))
+            groupEditor("Description", text: $description)
 
-            TextField("e.g. Soi 22 near 7-11", text: $location)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-
-            TextField("e.g. 09/05/2025 15:30", text: $dateTime)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-
-            Toggle("Is the animal still at the location?", isOn: $isStillThere)
-
-            TextField("Phone or social", text: $contact)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-
-            Button(action: {
-                showImagePicker = true
-            }) {
-                Image(systemName: "camera")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 30, height: 30)
-                    .foregroundColor(.gray)
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(12)
+            Button(action: { showImagePicker = true }) {
+                if let data = imageData, let uiImage = UIImage(data: data) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 200)
+                        .cornerRadius(12)
+                        .clipped()
+                } else {
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray)
+                        .frame(height: 200)
+                        .overlay(Text("Tap to select image").foregroundColor(.gray))
+                }
             }
         }
         .padding()
         .background(Color.white)
         .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
+        .shadow(radius: 4)
         .padding(.horizontal)
     }
 
+    private var conditionLocationSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Condition & Location").font(.headline)
+
+            WrapHStack(items: conditionOptions) { option in
+                Button(action: {
+                    toggleCondition(option)
+                }) {
+                    Text(option)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(selectedConditions.contains(option) ? Color.brandYellow : Color(.systemGray5))
+                        .foregroundColor(.black)
+                        .cornerRadius(16)
+                }
+            }
+
+            groupField("Location", text: $location)
+
+            VStack(alignment: .leading) {
+                Text("Date & Time Seen").font(.subheadline).foregroundColor(.gray)
+                DatePicker("Date & Time", selection: $dateTime, displayedComponents: [.date, .hourAndMinute])
+                    .labelsHidden()
+                    .datePickerStyle(CompactDatePickerStyle())
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(20)
+        .shadow(radius: 4)
+        .padding(.horizontal)
+    }
+
+    private var contactSubmitSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Contact & Submit").font(.headline)
+
+            Toggle("Is the dog still there?", isOn: $isStillThere)
+
+            TextField("Phone", text: $contact)
+                .keyboardType(.phonePad)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(10)
+
+            Button(action: submitReport) {
+                if isSubmitting {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .frame(width: 56, height: 56)
+                        .background(Color.gray)
+                        .clipShape(Circle())
+                } else {
+                    Text("Submit Report")
+                        .fontWeight(.bold)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.brandYellow)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
+            }
+            .disabled(isSubmitting)
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(20)
+        .shadow(radius: 4)
+        .padding(.horizontal)
+        .padding(.bottom)
+    }
+
+    private func groupField(_ label: String, text: Binding<String>) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label).font(.subheadline).foregroundColor(.gray)
+            TextField(label, text: text)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(10)
+        }
+    }
+
+    private func groupEditor(_ label: String, text: Binding<String>) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label).font(.subheadline).foregroundColor(.gray)
+            TextEditor(text: text)
+                .frame(height: 100)
+                .padding(4)
+                .background(Color(.systemGray6))
+                .cornerRadius(10)
+        }
+    }
+
+    private func toggleCondition(_ option: String) {
+        if let index = selectedConditions.firstIndex(of: option) {
+            selectedConditions.remove(at: index)
+        } else {
+            selectedConditions.append(option)
+        }
+    }
+
     private func submitReport() {
-        guard let uid = session.currentUser?.uid else { return }
-        isSubmitting = true
+        guard let uid = session.currentUser?.uid else {
+            alertMessage = "You must be logged in."
+            showAlert = true
+            return
+        }
 
         let sid = UUID().uuidString
+        isSubmitting = true
 
         func saveToFirestore(imageURL: String) {
             let db = Firestore.firestore()
             let newReport: [String: Any] = [
                 "sid": sid,
                 "petType": petType,
-                "condition": condition,
+                "condition": selectedConditions.joined(separator: ", "),
                 "description": description,
                 "location": location,
-                "dateTime": dateTime,
+                "dateTime": formattedDate(dateTime),
                 "isStillThere": isStillThere,
                 "contact": contact,
                 "imageName": imageURL,
@@ -180,7 +246,13 @@ struct ReportStrayView: View {
 
             db.collection("StrayReport").document(sid).setData(newReport) { error in
                 isSubmitting = false
-                submitted = true
+                if let error = error {
+                    alertMessage = "Failed to submit: \(error.localizedDescription)"
+                } else {
+                    alertMessage = "Report sent to the rescue team."
+                    resetForm()
+                }
+                showAlert = true
             }
         }
 
@@ -188,10 +260,9 @@ struct ReportStrayView: View {
             let ref = Storage.storage().reference().child("stray_images/\(sid).jpg")
             ref.putData(imageData, metadata: nil) { _, error in
                 if let error = error {
-                    print("❌ Image upload failed: \(error.localizedDescription)")
                     saveToFirestore(imageURL: "")
                 } else {
-                    ref.downloadURL { url, error in
+                    ref.downloadURL { url, _ in
                         saveToFirestore(imageURL: url?.absoluteString ?? "")
                     }
                 }
@@ -200,10 +271,79 @@ struct ReportStrayView: View {
             saveToFirestore(imageURL: "")
         }
     }
+
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy HH:mm"
+        return formatter.string(from: date)
+    }
+
+    private func resetForm() {
+        petType = "Dog"
+        selectedConditions = []
+        description = ""
+        location = ""
+        dateTime = Date()
+        isStillThere = false
+        contact = ""
+        imageData = nil
+    }
 }
 
+struct WrapHStack<Content: View, T: Hashable>: View {
+    var items: [T]
+    var spacing: CGFloat = 8
+    var alignment: HorizontalAlignment = .leading
+    var content: (T) -> Content
 
-#Preview {
-    ReportStrayView()
-        .environmentObject(SessionManager())
+    @State private var totalHeight: CGFloat = .zero
+
+    var body: some View {
+        GeometryReader { geometry in
+            self.generateContent(in: geometry)
+        }
+        .frame(height: totalHeight)
+    }
+
+    private func generateContent(in geometry: GeometryProxy) -> some View {
+        var width = CGFloat.zero
+        var height = CGFloat.zero
+
+        return ZStack(alignment: Alignment(horizontal: alignment, vertical: .top)) {
+            ForEach(items, id: \.self) { item in
+                content(item)
+                    .padding([.horizontal, .vertical], 4)
+                    .alignmentGuide(.leading, computeValue: { d in
+                        if abs(width - d.width) > geometry.size.width {
+                            width = 0
+                            height -= d.height + spacing
+                        }
+                        let result = width
+                        if item == items.last {
+                            width = 0
+                        } else {
+                            width -= d.width + spacing
+                        }
+                        return result
+                    })
+                    .alignmentGuide(.top, computeValue: { _ in
+                        let result = height
+                        if item == items.last {
+                            height = 0
+                        }
+                        return result
+                    })
+            }
+        }
+        .background(viewHeightReader())
+    }
+
+    private func viewHeightReader() -> some View {
+        GeometryReader { geometry -> Color in
+            DispatchQueue.main.async {
+                self.totalHeight = geometry.size.height
+            }
+            return Color.clear
+        }
+    }
 }
