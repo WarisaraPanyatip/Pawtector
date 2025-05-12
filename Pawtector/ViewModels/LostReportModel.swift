@@ -71,4 +71,34 @@ class LostReportModel: ObservableObject {
             print("✅ Final pet count: \(self.lostPets.count)")
         }
     }
+
+//    func markAsFound(petID: String) {
+//        let db = Firestore.firestore()
+//        db.collection("LostPets").document(petID).updateData([
+//            "status": true
+//        ]) { error in
+//            if let error = error {
+//                print("❌ Failed to mark as found: \(error.localizedDescription)")
+//            } else {
+//                print("✅ Pet marked as found.")
+//
+//                // Optional: Update local list immediately
+//                if let index = self.lostPets.firstIndex(where: { $0.pid == petID }) {
+//                    self.lostPets[index].status = true
+//                    self.objectWillChange.send()
+//                }
+//            }
+//        }
+//    }
+
+    func markAsFound(petID: String, completion: (() -> Void)? = nil) {
+        let db = Firestore.firestore()
+        db.collection("LostReport").document(petID).updateData(["status": true]) { error in
+            if error == nil {
+                self.fetchLostReports()
+                completion?()
+            }
+        }
+    }
+
 }

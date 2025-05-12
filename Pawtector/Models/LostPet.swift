@@ -13,7 +13,7 @@ struct LostPet: Identifiable {
     let imageURL: String
     let healthStatus: String
     let personality: String
-    let status: Bool
+    var status: Bool
     let reward: String
     let lastSeen: String
     let description: String

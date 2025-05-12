@@ -6,25 +6,28 @@ struct LostAndFoundView: View {
     @State private var searchText = ""
     @State private var selectedTab = 0
     @Namespace private var tabNamespace
-
+    
     private let columns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
-
+    
     var filteredPets: [LostPet] {
+        let activePets = lostReportModel.lostPets.filter { !$0.status } // Only not-found
+
         if searchText.isEmpty {
-            return lostReportModel.lostPets
+            return activePets
         } else {
-            return lostReportModel.lostPets.filter {
+            return activePets.filter {
                 $0.name.localizedCaseInsensitiveContains(searchText) ||
                 $0.breed.localizedCaseInsensitiveContains(searchText)
             }
         }
     }
 
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 header
-
+                
                 ScrollView {
                     if selectedTab == 0 {
                         LazyVGrid(columns: columns, spacing: 20) {
@@ -45,7 +48,7 @@ struct LostAndFoundView: View {
         }
         .environmentObject(lostReportModel)
     }
-
+    
     private var header: some View {
         VStack(spacing: 0) {
             ZStack(alignment: .top) {
@@ -53,21 +56,21 @@ struct LostAndFoundView: View {
                     .opacity(0.2)
                     .ignoresSafeArea(edges: .top)
                     .frame(height: 90)
-
+                
                 VStack(spacing: 12) {
                     HStack {
                         Image("logo_black")
                             .resizable()
                             .frame(width: 60, height: 60)
                             .padding(.leading)
-
+                        
                         Spacer()
-
+                        
                         VStack(alignment: .trailing, spacing: 4) {
                             Text("Lost & Found")
                                 .font(.system(size: 24, weight: .bold))
                                 .foregroundColor(.brandBrown)
-
+                            
                             Text("Announce lost pets to help them home")
                                 .font(.system(size: 14))
                                 .foregroundColor(.brandBrown)
@@ -78,30 +81,31 @@ struct LostAndFoundView: View {
                     .padding(.horizontal)
                 }
             }
-
+            
             tabSelector
-
-            HStack {
-                TextField("Search pets by Name, Type, Breed", text: $searchText)
-                    .padding(8)
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-            }
-            .padding(.top, 8)
+            
+            //            HStack {
+            //                TextField("Search pets by Name, Type, Breed", text: $searchText)
+            //                    .padding(8)
+            //                    .background(Color.white)
+            //                    .cornerRadius(10)
+            //                    .padding(.horizontal)
+            //            }
+            //            .padding(.top, 8)
         }
     }
-
+    
     private var tabSelector: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 12) {
             ForEach(["Lost Pets", "Report Lost"], id: \.self) { title in
                 let index = title == "Lost Pets" ? 0 : 1
                 Text(title)
                     .font(.headline)
-                    .foregroundColor(selectedTab == index ? .brandBrown : .black)
+                    .foregroundColor(selectedTab == index ? .black : .brandBrown)
                     .padding(.vertical, 12)
+                    .padding(.horizontal, 8) // Inner horizontal padding
                     .frame(maxWidth: .infinity)
-                    .background(selectedTab == index ? Color(.systemGray5): Color.brandYellow.opacity(0.2))
+                    .background(selectedTab == index ? Color(.systemGray5) : Color.brandYellow.opacity(0.2))
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .onTapGesture {
                         withAnimation(.easeInOut) {
@@ -112,6 +116,7 @@ struct LostAndFoundView: View {
         }
         .padding(.horizontal)
         .padding(.top)
+        .padding(.bottom, 16) // Space below the tab selector
     }
 }
 

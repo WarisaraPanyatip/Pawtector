@@ -35,7 +35,7 @@ struct ReportLostView: View {
         ScrollView {
             VStack(spacing: 24) {
                 // Stepper UI
-                stepper
+                //stepper
 
                 // Form UI
                 formCard
@@ -56,24 +56,24 @@ struct ReportLostView: View {
     }
 
     // MARK: - Components
-
-    private var stepper: some View {
-        HStack(spacing: 24) {
-            stepCircle("1", active: true)
-            stepCircle("2", active: false)
-            stepCircle("3", active: false)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private func stepCircle(_ number: String, active: Bool) -> some View {
-        Text(number)
-            .font(.headline)
-            .foregroundColor(.white)
-            .frame(width: 36, height: 36)
-            .background(active ? Color.orange : Color.gray.opacity(0.4))
-            .clipShape(Circle())
-    }
+//
+//    private var stepper: some View {
+//        HStack(spacing: 24) {
+//            stepCircle("1", active: true)
+//            stepCircle("2", active: false)
+//            stepCircle("3", active: false)
+//        }
+//        .frame(maxWidth: .infinity)
+//    }
+//
+//    private func stepCircle(_ number: String, active: Bool) -> some View {
+//        Text(number)
+//            .font(.headline)
+//            .foregroundColor(.white)
+//            .frame(width: 36, height: 36)
+//            .background(active ? Color.orange : Color.gray.opacity(0.4))
+//            .clipShape(Circle())
+//    }
 
     private var formCard: some View {
         VStack(spacing: 16) {
@@ -179,21 +179,23 @@ struct ReportLostView: View {
             if isSubmitting {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    .frame(width: 56, height: 56)
+                    .frame(maxWidth: .infinity)
+                    .padding()
                     .background(Color.gray)
-                    .clipShape(Circle())
+                    .cornerRadius(10)
             } else {
-                Image(systemName: "arrow.right")
-                    .font(.headline)
+                Text("Submit")
                     .foregroundColor(.white)
-                    .frame(width: 56, height: 56)
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity)
+                    .padding()
                     .background(Color.orange)
-                    .clipShape(Circle())
+                    .cornerRadius(10)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .trailing)
         .padding(.horizontal)
         .padding(.bottom)
+
     }
 
     // MARK: - Logic

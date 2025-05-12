@@ -26,6 +26,20 @@ struct ReportStrayView: View {
             header
             ScrollView {
                 VStack(spacing: 32) {
+                    // 🧾 Instruction Box
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("📢 How It Works")
+                            .font(.headline)
+                            .foregroundColor(.brandBrown)
+                        Text("🐶 Report a stray dog or cat to help them. SoiDog Foundation will assist and notify you once the animal is rescued.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(16)
+                    .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+                    .padding(.horizontal)
                     petDetailsSection
                     conditionLocationSection
                     contactSubmitSection
@@ -75,8 +89,8 @@ struct ReportStrayView: View {
 
     private var petDetailsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Pet Details").font(.headline)
-
+            //Text("Pet Details").font(.headline)
+            Text("Pet Details").font(.subheadline).foregroundColor(.gray)
             HStack {
                 ForEach(["Dog", "Cat"], id: \.self) { type in
                     Button(action: {
@@ -112,15 +126,16 @@ struct ReportStrayView: View {
         }
         .padding()
         .background(Color.white)
-        .cornerRadius(20)
-        .shadow(radius: 4)
+        .cornerRadius(16)
+//        .shadow(radius: 4)
         .padding(.horizontal)
+        .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
     }
 
     private var conditionLocationSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Condition & Location").font(.headline)
-
+//            Text("Condition & Location").font(.headline)
+            Text("Condition").font(.subheadline).foregroundColor(.gray)
             WrapHStack(items: conditionOptions) { option in
                 Button(action: {
                     toggleCondition(option)
@@ -145,22 +160,23 @@ struct ReportStrayView: View {
         }
         .padding()
         .background(Color.white)
-        .cornerRadius(20)
-        .shadow(radius: 4)
+        .cornerRadius(16)
+//        .shadow(radius: 4)
         .padding(.horizontal)
+        .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
     }
 
     private var contactSubmitSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Contact & Submit").font(.headline)
+            Text("Submit").font(.headline)
 
-            Toggle("Is the dog still there?", isOn: $isStillThere)
+            Toggle("Is the dog/cat still there?", isOn: $isStillThere)
 
-            TextField("Phone", text: $contact)
-                .keyboardType(.phonePad)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(10)
+//            TextField("Phone", text: $contact)
+//                .keyboardType(.phonePad)
+//                .padding()
+//                .background(Color(.systemGray6))
+//                .cornerRadius(10)
 
             Button(action: submitReport) {
                 if isSubmitting {
@@ -183,9 +199,9 @@ struct ReportStrayView: View {
         }
         .padding()
         .background(Color.white)
-        .cornerRadius(20)
-        .shadow(radius: 4)
+        .cornerRadius(16)
         .padding(.horizontal)
+        .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
         .padding(.bottom)
     }
 
