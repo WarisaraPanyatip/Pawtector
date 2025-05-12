@@ -1,5 +1,4 @@
 import Foundation
-import FirebaseAuth
 import FirebaseFirestore
 
 class AdoptionRequestViewModel: ObservableObject {
@@ -8,7 +7,7 @@ class AdoptionRequestViewModel: ObservableObject {
     private let db = Firestore.firestore()
 
     func fetchRequests(for userId: String) {
-        db.collection("RequestAdoption")
+        db.collection("AdoptionRequest")
             .whereField("userId", isEqualTo: userId)
             .order(by: "timestamp", descending: true)
             .getDocuments { snapshot, error in
@@ -17,8 +16,33 @@ class AdoptionRequestViewModel: ObservableObject {
                     return
                 }
 
+                print("Fetched adoption request docs:")
+                snapshot?.documents.forEach { doc in
+                    print(doc.documentID, doc.data())
+                }
+
                 self.requests = snapshot?.documents.compactMap { doc in
-                    try? doc.data(as: AdoptionRequest.self)
+                    let data = doc.data()
+                    guard
+                        let userId = data["userId"] as? String,
+                        let petId = data["petId"] as? String,
+                        let status = data["status"] as? String,
+                        let timestamp = data["timestamp"] as? Timestamp
+                    else {
+                        return nil
+                    }
+
+                    // Use existing 'rid' if available, otherwise fall back to document ID
+                    let rid = data["rid"] as? String ?? doc.documentID
+
+                    return AdoptionRequest(
+                        id: doc.documentID,
+                        rid: rid,
+                        userId: userId,
+                        petId: petId,
+                        status: status,
+                        timestamp: timestamp.dateValue()
+                    )
                 } ?? []
             }
     }

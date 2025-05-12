@@ -3,6 +3,9 @@ import SwiftUI
 struct HistoryView: View {
     @StateObject private var lostReportModel = LostReportModel()
     @StateObject private var strayReportViewModel = StrayReportViewModel()
+    @StateObject private var requestViewModel = AdoptionRequestViewModel()
+    @EnvironmentObject var session: SessionManager
+
 
     var body: some View {
         NavigationStack {
@@ -29,23 +32,24 @@ struct HistoryView: View {
                 .padding(.top)
 
                 List {
-                    // Section: Adoption History (currently disabled)
-// Section(header: Text("Adoption History")) {
-//     ForEach(adoptionHistory) { pet in
-//         NavigationLink(destination: LostAndFoundDetailView(pet: pet)) {
-//             HStack {
-//                 Image(systemName: "pawprint.fill")
-//                     .foregroundColor(.green)
-//                 VStack(alignment: .leading) {
-//                     Text(pet.name)
-//                     Text("Adopted: \(pet.ageDescription)")
-//                         .font(.caption)
-//                         .foregroundColor(.gray)
-//                 }
-//             }
-//         }
-//     }
-// }
+                    Section(header: Text("Adoption Requests").foregroundColor(.brandBrown)) {
+                        if requestViewModel.requests.isEmpty {
+                            Text("No adoption requests yet.")
+                                .foregroundColor(.gray)
+                        } else {
+                            ForEach(requestViewModel.requests) { request in
+                                NavigationLink(destination: AdoptionRequestDetailView(request: request)) {
+                                    VStack(alignment: .leading) {
+                                        Text("Pet ID: \(request.petId)")
+                                        Text("Status: \(request.status.capitalized)")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
 
                     // Section: Stray Reports
                     Section(header: Text("Stray Reports").foregroundColor(.brandBrown)) {
@@ -98,7 +102,20 @@ struct HistoryView: View {
                 .onAppear {
                     strayReportViewModel.fetchReports()
                     lostReportModel.fetchLostReports()
+                        if let uid = session.currentUser?.uid {
+                            print("Current user ID:", uid)
+                            requestViewModel.fetchRequests(for: uid)
+                        } else {
+                            print("No user logged in")
+                        }
                 }
+                .onChange(of: session.currentUser?.uid) { newUID in
+                    if let uid = newUID {
+                        print("User loaded later, re-fetching requests")
+                        requestViewModel.fetchRequests(for: uid)
+                    }
+                }
+
             }
             .navigationTitle("")
             .navigationBarHidden(true)
@@ -200,7 +217,29 @@ struct LostReportDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+// MARK: - Adoption Request Detail View
+struct AdoptionRequestDetailView: View {
+    let request: AdoptionRequest
 
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Adoption Request Details")
+                .font(.title2).bold()
+
+            Text("Pet ID: \(request.petId)")
+            Text("Status: \(request.status.capitalized)")
+                .foregroundColor(.brandBrown)
+
+            Text("Requested on: \(request.timestamp.formatted(date: .abbreviated, time: .shortened))")
+
+            Spacer()
+        }
+        .padding()
+        .navigationTitle("Adoption Detail")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
 #Preview {
     HistoryView()
+        .environmentObject(SessionManager())
 }

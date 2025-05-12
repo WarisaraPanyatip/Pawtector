@@ -48,9 +48,9 @@ struct ProfileView: View {
                     ProfileActionButton(label: "How to Use", icon: "info.circle", bgColor: Color.brandBlue)
                 }
 
-//                NavigationLink(destination: HistoryView()) {
-//                    ProfileActionButton(label: "History", icon: "clock.circle", bgColor: Color.brandBlue)
-//                }
+                NavigationLink(destination: HistoryView()) {
+                    ProfileActionButton(label: "History", icon: "clock.circle", bgColor: Color.brandBlue)
+                }
 
                 Button(action: {
                     session.signOut()
