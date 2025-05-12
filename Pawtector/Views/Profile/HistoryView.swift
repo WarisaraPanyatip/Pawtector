@@ -267,9 +267,10 @@ struct AdoptionRequestDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
-//#Preview {
-//    HistoryView()
-//        .environmentObject(SessionManager())
-//}
 
+#Preview {
+    HistoryView()
+        .environmentObject(SessionManager())
+        .environmentObject(PetViewModel())
+}
 

@@ -1,7 +1,17 @@
+//
+//  ReportLostView.swift
+//  Pawtector
+//
+//  Created by Piyathida Changsuwan on 13/5/2568 BE.
+//
+
+
 // MARK: - ReportLostView
 
 import SwiftUI
 import FirebaseFirestore
+import FirebaseStorage
+
 
 struct ReportLostView: View {
     @EnvironmentObject var session: SessionManager
@@ -192,6 +202,8 @@ struct ReportLostView: View {
             return
         }
 
+        print("🧠 Image data size: \(imageData.count) bytes")
+
         let newID = UUID().uuidString
         let storageRef = Storage.storage().reference().child("lost_images/\(newID).jpg")
 
@@ -199,65 +211,74 @@ struct ReportLostView: View {
 
         uploadTask.observe(.success) { _ in
             storageRef.downloadURL { url, error in
-                if let error = error {
-                    alertMessage = "Failed to retrieve image URL: \(error.localizedDescription)"
-                    showAlert = true
-                    isSubmitting = false
-                    return
-                }
-
-                guard let imageUrl = url?.absoluteString else {
-                    alertMessage = "Invalid image URL."
-                    showAlert = true
-                    isSubmitting = false
-                    return
-                }
-
-                let db = Firestore.firestore()
-                let newReport: [String: Any] = [
-                    "user_id": userID,
-                    "pid": newID,
-                    "name": petName,
-                    "type": selectedPetType,
-                    "breed": breed,
-                    "gender": gender,
-                    "age": age,
-                    "imageURL": imageUrl, // ✅ CORRECT HERE
-                    "healthStatus": healthStatus,
-                    "personality": personality,
-                    "status": status,
-                    "reward": reward,
-                    "lastSeen": lastSeen,
-                    "description": description,
-                    "contact": contact,
-                    "color": color,
-                    "size": size,
-                    "wearing": wearing
-                ]
-
-                db.collection("LostReport").document(newID).setData(newReport) { error in
-                    isSubmitting = false
-                    if let error = error {
-                        alertMessage = "Failed to submit report: \(error.localizedDescription)"
-                    } else {
-                        alertMessage = "Report submitted successfully."
-                        resetForm()
-                        lostReportModel.fetchLostReports()
-                    }
-                    showAlert = true
+                if let url = url {
+                    print("✅ Uploaded image URL: \(url)")
+                    saveReportToFirestore(imageURL: url.absoluteString)
+                } else {
+                    print("⚠️ Failed to get download URL, saving locally instead")
+                    fallbackToLocalSave()
                 }
             }
         }
 
         uploadTask.observe(.failure) { snapshot in
-            if let error = snapshot.error {
-                alertMessage = "Image upload failed: \(error.localizedDescription)"
+            print("❌ Upload to Firebase failed, falling back to local save")
+            fallbackToLocalSave()
+        }
+
+        func fallbackToLocalSave() {
+            let filename = "\(newID).jpg"
+            if let localURL = saveImageLocally(imageData, fileName: filename) {
+                saveReportToFirestore(imageURL: localURL.absoluteString)
+            } else {
+                alertMessage = "Failed to upload or save image."
                 showAlert = true
                 isSubmitting = false
             }
         }
 
+        func saveReportToFirestore(imageURL: String) {
+            let db = Firestore.firestore()
+            let newReport: [String: Any] = [
+                "user_id": userID,
+                "pid": newID,
+                "name": petName,
+                "type": selectedPetType,
+                "breed": breed,
+                "gender": gender,
+                "age": age,
+                "imageURL": imageURL,
+                "healthStatus": healthStatus,
+                "personality": personality,
+                "status": status,
+                "reward": reward,
+                "lastSeen": lastSeen,
+                "description": description,
+                "contact": contact,
+                "color": color,
+                "size": size,
+                "wearing": wearing
+            ]
+
+            db.collection("LostReport").document(newID).setData(newReport) { error in
+                isSubmitting = false
+                if let error = error {
+                    print("❌ Failed to save report: \(error.localizedDescription)")
+                    alertMessage = "Failed to submit report: \(error.localizedDescription)"
+                } else {
+                    print("✅ Report saved to Firestore.")
+                    alertMessage = "Report submitted successfully."
+                    resetForm()
+                    lostReportModel.fetchLostReports()
+                }
+                showAlert = true
+            }
+        }
     }
+
+
+
+
 
     private func resetForm() {
         petName = ""
@@ -277,3 +298,25 @@ struct ReportLostView: View {
         wearing = ""
     }
 }
+
+func saveImageLocally(_ data: Data, fileName: String) -> URL? {
+    let fileManager = FileManager.default
+    let directory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+    let fileURL = directory.appendingPathComponent(fileName)
+
+    do {
+        try data.write(to: fileURL)
+        print("✅ Image saved locally at: \(fileURL)")
+        return fileURL
+    } catch {
+        print("❌ Failed to save image locally: \(error.localizedDescription)")
+        return nil
+    }
+}
+
+#Preview {
+    ReportLostView()
+        .environmentObject(SessionManager())
+        .environmentObject(LostReportModel())
+}
+

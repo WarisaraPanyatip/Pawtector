@@ -48,7 +48,8 @@ struct ProfileView: View {
                     ProfileActionButton(label: "How to Use", icon: "info.circle", bgColor: Color.brandBlue)
                 }
 
-                NavigationLink(destination: HistoryView()) {
+                NavigationLink(destination: HistoryView().environmentObject(SessionManager())
+                    .environmentObject(PetViewModel())) {
                     ProfileActionButton(label: "History", icon: "clock.circle", bgColor: Color.brandBlue)
                 }
 

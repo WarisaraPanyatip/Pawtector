@@ -3,7 +3,7 @@ import FirebaseFirestore
 import FirebaseAuth
 import FirebaseStorage
 
-struct ReportStraytView: View {
+struct ReportStrayView: View {
     @EnvironmentObject var session: SessionManager
     @State private var petType = "Dog"
     @State private var condition = ""
@@ -194,6 +194,6 @@ struct ReportStraytView: View {
 
 
 #Preview {
-    ReportStraytView()
+    ReportStrayView()
         .environmentObject(SessionManager())
 }
