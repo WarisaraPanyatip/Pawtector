@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseStorage
 
 // MARK: - LostAndFoundView
 struct LostAndFoundView: View {
@@ -147,12 +148,30 @@ struct AnnounceLostPetView: View {
                                     } label: {
                                         VStack(spacing: 8) {
                                             ZStack(alignment: .topLeading) {
-                                                Image(pet.imageName)
-                                                    .resizable()
-                                                    .aspectRatio(contentMode: .fill)
-                                                    .frame(height: 140)
-                                                    .clipped()
-                                                    .cornerRadius(16)
+                                                AsyncImage(url: URL(string: pet.imageURL)) { phase in
+                                                    switch phase {
+                                                    case .empty:
+                                                        ProgressView()
+                                                            .frame(width: 240, height: 240)
+                                                    case .success(let image):
+                                                        image
+                                                            .resizable()
+                                                            .aspectRatio(contentMode: .fill)
+                                                            .frame(width: 240, height: 240)
+                                                            .clipShape(RoundedRectangle(cornerRadius: 25))
+                                                            .shadow(radius: 10)
+                                                    case .failure:
+                                                        Image("placeholder")
+                                                            .resizable()
+                                                            .aspectRatio(contentMode: .fill)
+                                                            .frame(width: 240, height: 240)
+                                                            .clipShape(RoundedRectangle(cornerRadius: 25))
+                                                            .shadow(radius: 10)
+                                                    @unknown default:
+                                                        EmptyView()
+                                                    }
+                                                }
+
                                                 
                                                 Text("Reward \(pet.reward)")
                                                     .font(.caption2)
@@ -220,12 +239,30 @@ struct LostAndFoundDetailView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                Image(pet.imageName)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 240, height: 240)
-                    .clipShape(RoundedRectangle(cornerRadius: 25))
-                    .shadow(radius: 10)
+                AsyncImage(url: URL(string: pet.imageURL)) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                            .frame(width: 240, height: 240)
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 240, height: 240)
+                            .clipShape(RoundedRectangle(cornerRadius: 25))
+                            .shadow(radius: 10)
+                    case .failure:
+                        Image("placeholder")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 240, height: 240)
+                            .clipShape(RoundedRectangle(cornerRadius: 25))
+                            .shadow(radius: 10)
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+
 
                 Text(pet.name)
                     .font(.headline)
@@ -332,6 +369,8 @@ import FirebaseFirestore
 struct ReportLostView: View {
     @EnvironmentObject var session: SessionManager
     @EnvironmentObject var lostReportModel: LostReportModel
+    @State private var imageData: Data?
+    @State private var showImagePicker = false
     @State private var selectedPetType = "Dog"
     @State private var petName = ""
     @State private var lastSeen = ""
@@ -341,7 +380,7 @@ struct ReportLostView: View {
     @State private var wearing = ""
     @State private var contact = ""
     @State private var reward = ""
-    @State private var imageName = "placeholder" // Default placeholder image
+    @State private var imageURL = "placeholder" // Default placeholder image
     @State private var gender = "Male"
     @State private var age: Float = 1.0
     @State private var breed = ""
@@ -439,6 +478,27 @@ struct ReportLostView: View {
                             Text("Health Status").font(.subheadline)
                             TextField("e.g. injured, healthy", text: $healthStatus)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                            Button(action: {
+                                showImagePicker = true
+                            }) {
+                                if let data = imageData, let uiImage = UIImage(data: data) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(height: 200)
+                                        .clipped()
+                                        .cornerRadius(12)
+                                } else {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.gray)
+                                        .frame(height: 200)
+                                        .overlay(Text("Tap to select image"))
+                                }
+                            }
+                            .sheet(isPresented: $showImagePicker) {
+                                ImagePicker(data: $imageData)
+                            }
+
                         }
                     }
                     .padding()
@@ -488,50 +548,86 @@ struct ReportLostView: View {
             return
         }
 
-        let db = Firestore.firestore()
-        let newID = UUID().uuidString
-
-        let newReport: [String: Any] = [
-            "user_id": userID,
-            "pid": newID,
-            "name": petName,
-            "type": selectedPetType,
-            "breed": breed,
-            "gender": gender,
-            "age": age,
-            "imageName": imageName,
-            "healthStatus": healthStatus,
-            "personality": personality,
-            "status": status,
-            "reward": reward,
-            "lastSeen": lastSeen,
-            "description": description,
-            "contact": contact,
-            "color": color,
-            "size": size,
-            "wearing": wearing
-        ]
-
-        db.collection("LostReport").document(newID).setData(newReport) { error in
-            isSubmitting = false
-            if let error = error {
-                alertMessage = "Failed to submit report: \(error.localizedDescription)"
-            } else {
-                alertMessage = "Report submitted successfully."
-                resetForm()
-                lostReportModel.fetchLostReports()
-            }
+        guard let imageData = imageData else {
+            alertMessage = "Please select an image."
             showAlert = true
+            isSubmitting = false
+            return
         }
-    }
 
+        let newID = UUID().uuidString
+        let storageRef = Storage.storage().reference().child("lost_images/\(newID).jpg")
+
+        let uploadTask = storageRef.putData(imageData, metadata: nil)
+
+        uploadTask.observe(.success) { _ in
+            storageRef.downloadURL { url, error in
+                if let error = error {
+                    alertMessage = "Failed to retrieve image URL: \(error.localizedDescription)"
+                    showAlert = true
+                    isSubmitting = false
+                    return
+                }
+
+                guard let imageUrl = url?.absoluteString else {
+                    alertMessage = "Invalid image URL."
+                    showAlert = true
+                    isSubmitting = false
+                    return
+                }
+
+                let db = Firestore.firestore()
+                let newReport: [String: Any] = [
+                    "user_id": userID,
+                    "pid": newID,
+                    "name": petName,
+                    "type": selectedPetType,
+                    "breed": breed,
+                    "gender": gender,
+                    "age": age,
+                    "imageURL": imageUrl, // ✅ CORRECT HERE
+                    "healthStatus": healthStatus,
+                    "personality": personality,
+                    "status": status,
+                    "reward": reward,
+                    "lastSeen": lastSeen,
+                    "description": description,
+                    "contact": contact,
+                    "color": color,
+                    "size": size,
+                    "wearing": wearing
+                ]
+
+                db.collection("LostReport").document(newID).setData(newReport) { error in
+                    isSubmitting = false
+                    if let error = error {
+                        alertMessage = "Failed to submit report: \(error.localizedDescription)"
+                    } else {
+                        alertMessage = "Report submitted successfully."
+                        resetForm()
+                        lostReportModel.fetchLostReports()
+                    }
+                    showAlert = true
+                }
+            }
+        }
+
+        uploadTask.observe(.failure) { snapshot in
+            if let error = snapshot.error {
+                alertMessage = "Image upload failed: \(error.localizedDescription)"
+                showAlert = true
+                isSubmitting = false
+            }
+        }
+
+    }
 
     private func resetForm() {
         petName = ""
         breed = ""
         gender = "Male"
         age = 1.0
-        imageName = "placeholder"
+        imageURL = "placeholder"
         healthStatus = ""
         personality = ""
         status = false

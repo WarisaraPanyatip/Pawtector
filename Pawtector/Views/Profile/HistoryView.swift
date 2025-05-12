@@ -186,7 +186,7 @@ struct LostReportDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Image(pet.imageName)
+                Image(pet.imageURL)
                     .resizable()
                     .scaledToFill()
                     .frame(height: 200)

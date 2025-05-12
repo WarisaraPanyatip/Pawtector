@@ -10,7 +10,7 @@ struct LostPet: Identifiable {
     let breed: String
     let gender: String
     let age: Float
-    let imageName: String
+    let imageURL: String
     let healthStatus: String
     let personality: String
     let status: Bool
