@@ -16,6 +16,7 @@ struct PetDetailView: View {
                     .resizable()
                     .scaledToFill()
                     .frame(height: 300)
+                    .cornerRadius(20)
                     .clipped()
 
                 // Pet Name
@@ -32,10 +33,10 @@ struct PetDetailView: View {
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color(.systemGray6))
-                )
+//                .background(
+//                    RoundedRectangle(cornerRadius: 16)
+//                        .fill(Color(Color.brandYellow).opacity(0.2))
+                
 
                 // Detail Blocks
                 VStack(spacing: 16) {
@@ -109,7 +110,7 @@ struct PetDetailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemGray6))
+                .fill(Color(Color.brandBrown).opacity(0.1))
         )
     }
 

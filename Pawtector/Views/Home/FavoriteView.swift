@@ -23,14 +23,14 @@ struct FavoriteView: View {
                     // MARK: - Header
                     ZStack(alignment: .top) {
                         Color.brandYellow
-                            .opacity(0.5)
+                            .opacity(0.2)
                             .ignoresSafeArea(edges: .top)
-                            .frame(height: 120) // Increased height for spacing
+                            .frame(height: 90) // Increased height for spacing
                         
                         HStack {
                             Image("logo_black")
                                 .resizable()
-                                .frame(width: 40, height: 40)
+                                .frame(width: 60, height: 60)
                                 .padding(.leading)
                             
                             Spacer()
@@ -46,7 +46,7 @@ struct FavoriteView: View {
                             }
                             .padding(.trailing)
                         }
-                        .padding(.top, 40) // Push content up closer to status bar
+                        .padding(.top, 20) // Push content up closer to status bar
                         .padding(.horizontal)
                     }
                     

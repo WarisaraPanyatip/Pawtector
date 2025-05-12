@@ -6,49 +6,76 @@ struct RequestAdoptionView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var requestSent: Bool
 
-    let petId: String // Pass the pet's ID into this view
+    let petId: String
 
     @State private var showingAlert = false
     @State private var sending = false
 
     var body: some View {
-        VStack(spacing: 32) {
-            Spacer()
-
-            Image(systemName: "heart.circle.fill")
-                .resizable()
-                .frame(width: 120, height: 120)
-                .foregroundColor(.brandYellow)
-
-            Text("Request to adopt")
-                .font(.largeTitle).bold()
-                .foregroundColor(.brandBlue)
-
-            Text("After requesting, the foundation will contact you back in a few days.")
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-
-            Spacer()
-
-            Button(action: {
-                sendAdoptionRequest()
-            }) {
-                if sending {
-                    ProgressView()
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                } else {
-                    Text("Request confirmation")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
+        NavigationStack {
+            VStack(spacing: 24) {
+                
+                // MARK: - Dismiss Button
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "xmark")
+                            .foregroundColor(.brandBrown)
+                            .padding(10)
+                            .background(Color.white.opacity(0.7))
+                            .clipShape(Circle())
+                    }
+                    .padding()
                 }
+
+                Spacer()
+
+                // MARK: - Logo
+                Image("logo_soidog")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 120, height: 120)
+                    .clipShape(Circle())
+                    .shadow(color: .gray.opacity(0.4), radius: 8, x: 0, y: 4)
+
+                // MARK: - Title
+                Text("Request to adopt")
+                    .font(.largeTitle).bold()
+                    .foregroundColor(.brandBrown)
+
+                Text("After requesting, the foundation will contact you back in a few days.")
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 32)
+
+                Spacer()
+
+                // MARK: - Confirmation Button
+                Button(action: {
+                    sendAdoptionRequest()
+                }) {
+                    if sending {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    } else {
+                        Text("Request confirmation")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    }
+                }
+                .background(Color.brandYellow)
+                .foregroundColor(.white)
+                .cornerRadius(12)
+                .padding(.horizontal, 32)
+                .padding(.bottom, 40) // give breathing space
+                .disabled(sending)
             }
-            .background(Color.brandYellow)
-            .foregroundColor(.white)
-            .cornerRadius(12)
-            .padding(.horizontal)
-            .disabled(sending)
+            .background(Color(.systemGray6))
+            .ignoresSafeArea()
             .alert("Your request was sent", isPresented: $showingAlert) {
                 Button("OK") {
                     requestSent = true
@@ -58,8 +85,6 @@ struct RequestAdoptionView: View {
                 Text("Foundation will contact you soon")
             }
         }
-        .background(Color(.systemGray6))
-        .ignoresSafeArea(edges: .bottom)
     }
 
     private func sendAdoptionRequest() {
@@ -70,7 +95,7 @@ struct RequestAdoptionView: View {
         let rid = UUID().uuidString
 
         let requestData: [String: Any] = [
-            "rid": rid, // ✅ Add this
+            "rid": rid,
             "userId": user.uid,
             "petId": petId,
             "status": "pending",
@@ -84,7 +109,6 @@ struct RequestAdoptionView: View {
                 print("Failed to send adoption request: \(error.localizedDescription)")
             } else {
                 print("Adoption request stored in Firestore")
-                // Optionally: trigger email via backend or cloud function
                 showingAlert = true
             }
         }

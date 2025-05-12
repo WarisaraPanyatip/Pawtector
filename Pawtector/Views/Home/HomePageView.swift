@@ -184,15 +184,15 @@ struct HomePageView: View {
             ZStack(alignment: .top) {
                 // Extended background
                 Color.brandYellow
-                    .opacity(0.5)
+                    .opacity(0.2)
                     .ignoresSafeArea(edges: .top)
-                    .frame(height: 110) // Increased height
+                    .frame(height: 90) // Increased height
 
                 VStack(spacing: 16) {
                     HStack {
                         Image("logo_black")
                             .resizable()
-                            .frame(width: 40, height: 40) // Slightly smaller for balance
+                            .frame(width: 60, height: 60) // Slightly smaller for balance
                             .padding(.leading)
 
                         Spacer()
@@ -208,7 +208,7 @@ struct HomePageView: View {
                         }
                         .padding(.trailing)
                     }
-                    .padding(.top, 30) // Pull up into the safe area
+                    .padding(.top, 20) // Pull up into the safe area
                     .padding(.horizontal)
                 }
             }
